@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-12
+# 직접 고치지 말고 `build-themes enable linear.app` 을 다시 실행할 것.
+key: linear.app
+name: Linear
+primary: '#5E6AD2'
+secondary: '#F7F8F8'
+verified: 2026-07-12
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/linear/000000
+paths:
+- ~/Desktop/linear.app(|/*)

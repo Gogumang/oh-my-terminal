@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-06
+# 직접 고치지 말고 `build-themes enable cloudflare` 을 다시 실행할 것.
+key: cloudflare
+name: Cloudflare
+primary: '#F6821F'
+secondary: '#1D1F20'
+verified: 2026-06-06
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/cloudflare/000000
+paths:
+- ~/Desktop/cloudflare(|/*)

@@ -1,13 +1,12 @@
 # catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
-# 직접 고치지 말고 tools/enable_brand.py 를 다시 실행할 것.
+# 직접 고치지 말고 `build-themes enable coupang` 을 다시 실행할 것.
 key: coupang
 name: Coupang
-primary: "#000000"
-secondary: "#000000"
-verified: "2026-07-13"
+primary: '#000000'
+secondary: '#000000'
+verified: 2026-07-13
 logo:
   kind: favicon
-  url: "https://www.google.com/s2/favicons?domain=coupang.com&sz=128"
-  keep_colour: true   # 색 면에서 글자를 파낸 앱 아이콘 — 실루엣 불가
+  url: https://www.coupang.com/favicon.ico
 paths:
-  - "~/Desktop/coupang(|/*)"
+- ~/Desktop/coupang(|/*)

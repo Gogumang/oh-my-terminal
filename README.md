@@ -35,13 +35,18 @@ exec zsh
 
 ## 회사 추가
 
-`catalog/brands.json`에 **440개 회사**의 브랜드 색과 로고 출처가 들어 있습니다
-([oh-my-design](https://github.com/kwakseongjae/oh-my-design), MIT). 원하는 회사만 켜면 됩니다.
+`catalog/brands.json`에 **440개 회사**의 브랜드 색과 로고 출처가 들어 있고
+([oh-my-design](https://github.com/kwakseongjae/oh-my-design), MIT), 그중 **로고를 확보한
+279개가 켜져 있습니다.** 나머지 161개는 출처가 봇 차단이거나 죽어서 로고를 못 받았습니다
+(Simple Icons 92/92 전부 성공, GitHub 18/26, 파비콘 168/322).
+
+회사를 더 켜거나 로고를 다시 받으려면:
 
 ```sh
 cd tools && cargo build --release && cd ..
-tools/target/release/build-themes enable coupang line socar
-tools/target/release/build-themes
+tools/target/release/build-themes logos          # 카탈로그 로고를 public/logo/ 에 수집
+tools/target/release/build-themes enable <회사>...  # brands/ 에 추가
+tools/target/release/build-themes                # 테마 생성
 ```
 
 **기반 폰트를 지정하세요.** 로고 글리프는 기존 폰트에 얹히므로, 지금 쓰는 폰트를
@@ -111,6 +116,20 @@ tools/                        빌드 (메인테이너 전용, Rust)
 ```
 
 도메인은 어떤 레이어에도 의존하지 않고, 어댑터가 포트를 구현합니다.
+
+## 규모와 비용
+
+279개를 켠 상태의 실측치입니다.
+
+| | 값 |
+|---|---|
+| `brands.zsh` | 524KB / 7,339줄 — 셸 시작 시 source **9.4ms** |
+| 폰트 | 5.9MB (로고 279개 sbix 글리프 + 기반 폰트) |
+| iTerm2 프로필 | 3.4MB / 279개 |
+| `cd` 로 회사 폴더 진입 | **0.09ms** (캐시 히트) / 0.34ms (미스) |
+
+셸 시작 9.4ms는 p10k 자체(보통 30~50ms)에 비하면 작습니다. 부담되면 `brands/`에서
+쓰지 않는 yaml을 지우고 다시 빌드하면 됩니다.
 
 ## 알려진 제약
 

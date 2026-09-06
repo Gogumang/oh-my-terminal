@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-06
+# 직접 고치지 말고 `build-themes enable duolingo` 을 다시 실행할 것.
+key: duolingo
+name: Duolingo
+primary: '#58CC02'
+secondary: '#4B4B4B'
+verified: 2026-06-06
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/duolingo/000000
+paths:
+- ~/Desktop/duolingo(|/*)

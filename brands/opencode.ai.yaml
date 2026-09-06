@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-05-15
+# 직접 고치지 말고 `build-themes enable opencode.ai` 을 다시 실행할 것.
+key: opencode.ai
+name: OpenCode AI
+primary: '#000000'
+secondary: '#201D1D'
+verified: 2026-05-15
+logo:
+  kind: github
+  url: https://github.com/opencode-ai.png?size=512
+paths:
+- ~/Desktop/opencode.ai(|/*)

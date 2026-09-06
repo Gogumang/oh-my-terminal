@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 `build-themes enable hyundai` 을 다시 실행할 것.
+key: hyundai
+name: Hyundai
+primary: '#002C5F'
+secondary: '#16181D'
+verified: 2026-07-13
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/hyundai/000000
+paths:
+- ~/Desktop/hyundai(|/*)

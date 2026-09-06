@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 `build-themes enable google` 을 다시 실행할 것.
+key: google
+name: Google
+primary: '#1A73E8'
+secondary: '#3C4043'
+verified: 2026-07-13
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/google/000000
+paths:
+- ~/Desktop/google(|/*)

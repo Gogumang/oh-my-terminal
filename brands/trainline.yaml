@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-22
+# 직접 고치지 말고 `build-themes enable trainline` 을 다시 실행할 것.
+key: trainline
+name: Trainline
+primary: '#00A88F'
+secondary: '#16181D'
+verified: 2026-06-22
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=thetrainline.com&sz=128
+paths:
+- ~/Desktop/trainline(|/*)

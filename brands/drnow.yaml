@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-03
+# 직접 고치지 말고 `build-themes enable drnow` 을 다시 실행할 것.
+key: drnow
+name: Dr.Now (닥터나우)
+primary: '#FF8D00'
+secondary: '#16181D'
+verified: 2026-06-03
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=doctornow.co.kr&sz=256
+paths:
+- ~/Desktop/drnow(|/*)

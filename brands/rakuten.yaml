@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-10
+# 직접 고치지 말고 `build-themes enable rakuten` 을 다시 실행할 것.
+key: rakuten
+name: Rakuten
+primary: '#BF0000'
+secondary: '#16181D'
+verified: 2026-06-10
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/rakuten/000000
+paths:
+- ~/Desktop/rakuten(|/*)

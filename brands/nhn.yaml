@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 `build-themes enable nhn` 을 다시 실행할 것.
+key: nhn
+name: NHN
+primary: '#212126'
+secondary: '#36363D'
+verified: 2026-07-13
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=nhn.com&sz=128
+paths:
+- ~/Desktop/nhn(|/*)

@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-22
+# 직접 고치지 말고 `build-themes enable deliveroo` 을 다시 실행할 것.
+key: deliveroo
+name: Deliveroo
+primary: '#00CCBC'
+secondary: '#16181D'
+verified: 2026-06-22
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/deliveroo/000000
+paths:
+- ~/Desktop/deliveroo(|/*)

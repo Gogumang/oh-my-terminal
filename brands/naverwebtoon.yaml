@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 `build-themes enable naverwebtoon` 을 다시 실행할 것.
+key: naverwebtoon
+name: Naver Webtoon
+primary: '#00DC64'
+secondary: '#000000'
+verified: 2026-07-13
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=comic.naver.com&sz=128
+paths:
+- ~/Desktop/naverwebtoon(|/*)

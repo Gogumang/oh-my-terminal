@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 `build-themes enable together.ai` 을 다시 실행할 것.
+key: together.ai
+name: Together AI
+primary: '#000000'
+secondary: '#16181D'
+verified: 2026-07-13
+logo:
+  kind: github
+  url: https://github.com/togethercomputer.png?size=512
+paths:
+- ~/Desktop/together.ai(|/*)

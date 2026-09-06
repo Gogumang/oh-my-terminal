@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-05-15
+# 직접 고치지 말고 `build-themes enable composio` 을 다시 실행할 것.
+key: composio
+name: Composio
+primary: '#6366F1'
+secondary: '#FFFFFF'
+verified: 2026-05-15
+logo:
+  kind: github
+  url: https://github.com/composiohq.png?size=512
+paths:
+- ~/Desktop/composio(|/*)

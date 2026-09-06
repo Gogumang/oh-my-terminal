@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 `build-themes enable shinhanbank` 을 다시 실행할 것.
+key: shinhanbank
+name: Shinhan Bank
+primary: '#0046FF'
+secondary: '#16181D'
+verified: 2026-07-13
+logo:
+  kind: github
+  url: https://github.com/Shinhan-Bank.png?size=512
+paths:
+- ~/Desktop/shinhanbank(|/*)

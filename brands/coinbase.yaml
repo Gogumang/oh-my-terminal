@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-05-15
+# 직접 고치지 말고 `build-themes enable coinbase` 을 다시 실행할 것.
+key: coinbase
+name: Coinbase
+primary: '#0052FF'
+secondary: '#0A0B0D'
+verified: 2026-05-15
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/coinbase/000000
+paths:
+- ~/Desktop/coinbase(|/*)

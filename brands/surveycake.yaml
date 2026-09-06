@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-08
+# 직접 고치지 말고 `build-themes enable surveycake` 을 다시 실행할 것.
+key: surveycake
+name: SurveyCake
+primary: '#3DBA90'
+secondary: '#16181D'
+verified: 2026-06-08
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=www.surveycake.com&sz=128
+paths:
+- ~/Desktop/surveycake(|/*)

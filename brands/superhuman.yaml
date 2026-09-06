@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-05-15
+# 직접 고치지 말고 `build-themes enable superhuman` 을 다시 실행할 것.
+key: superhuman
+name: Superhuman
+primary: '#5840FF'
+secondary: '#16181D'
+verified: 2026-05-15
+logo:
+  kind: github
+  url: https://github.com/superhuman.png?size=512
+paths:
+- ~/Desktop/superhuman(|/*)

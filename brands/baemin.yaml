@@ -1,13 +1,12 @@
 # catalog/brands.json에서 생성. 출처 검증일: 2026-07-12
-# 직접 고치지 말고 tools/enable_brand.py 를 다시 실행할 것.
+# 직접 고치지 말고 `build-themes enable baemin` 을 다시 실행할 것.
 key: baemin
 name: Baemin
-primary: "#0CEFD3"
-secondary: "#222222"
-verified: "2026-07-12"
+primary: '#0CEFD3'
+secondary: '#222222'
+verified: 2026-07-12
 logo:
   kind: favicon
-  url: "https://www.baemin.com/favicon.ico"
-  keep_colour: true   # 색 면에서 글자를 파낸 앱 아이콘 — 실루엣 불가
+  url: https://www.baemin.com/favicon.ico
 paths:
-  - "~/Desktop/baemin(|/*)"
+- ~/Desktop/baemin(|/*)

@@ -21,7 +21,7 @@ use super::rasterizer::rasterize_svg;
 use crate::domain::brand::Brand;
 
 pub const LOGO_SIZE: u32 = 512;
-const TIMEOUT: Duration = Duration::from_secs(20);
+const TIMEOUT: Duration = Duration::from_secs(8);
 /// 실루엣이 형태를 잃는 구간. 통짜 덩어리이거나 거의 빈 이미지면 알아볼 수 없다.
 const USABLE_COVERAGE: (f64, f64) = (0.06, 0.70);
 

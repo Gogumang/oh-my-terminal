@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 `build-themes enable likelion` 을 다시 실행할 것.
+key: likelion
+name: LikeLion
+primary: '#FF6000'
+secondary: '#222222'
+verified: 2026-07-13
+logo:
+  kind: favicon
+  url: https://likelion.net/img/favicon.png
+paths:
+- ~/Desktop/likelion(|/*)

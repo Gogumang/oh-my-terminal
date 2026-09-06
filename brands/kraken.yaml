@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-05-15
+# 직접 고치지 말고 `build-themes enable kraken` 을 다시 실행할 것.
+key: kraken
+name: Kraken
+primary: '#5741D9'
+secondary: '#101114'
+verified: 2026-05-15
+logo:
+  kind: github
+  url: https://github.com/krakenfx.png?size=512
+paths:
+- ~/Desktop/kraken(|/*)

@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-11
+# 직접 고치지 말고 `build-themes enable apple` 을 다시 실행할 것.
+key: apple
+name: Apple
+primary: '#000000'
+secondary: '#1D1D1F'
+verified: 2026-07-11
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/apple/000000
+paths:
+- ~/Desktop/apple(|/*)

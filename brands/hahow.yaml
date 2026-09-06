@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-01
+# 직접 고치지 말고 `build-themes enable hahow` 을 다시 실행할 것.
+key: hahow
+name: Hahow
+primary: '#00CCB4'
+secondary: '#16181D'
+verified: 2026-06-01
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=hahow.in&sz=128
+paths:
+- ~/Desktop/hahow(|/*)

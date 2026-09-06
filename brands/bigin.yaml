@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-26
+# 직접 고치지 말고 `build-themes enable bigin` 을 다시 실행할 것.
+key: bigin
+name: Bigin
+primary: '#006FFF'
+secondary: '#16181D'
+verified: 2026-06-26
+logo:
+  kind: favicon
+  url: https://www.bigin.io/favicon.ico
+paths:
+- ~/Desktop/bigin(|/*)

@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-22
+# 직접 고치지 말고 `build-themes enable esunbank` 을 다시 실행할 것.
+key: esunbank
+name: E.SUN Bank
+primary: '#00A19B'
+secondary: '#16181D'
+verified: 2026-06-22
+logo:
+  kind: favicon
+  url: https://www.esunbank.com/zh-tw/-/media/New-ESUNBANK/icon/apple-touch-icon/esun-icon.png
+paths:
+- ~/Desktop/esunbank(|/*)

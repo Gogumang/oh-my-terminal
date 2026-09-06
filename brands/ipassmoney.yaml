@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-22
+# 직접 고치지 말고 `build-themes enable ipassmoney` 을 다시 실행할 것.
+key: ipassmoney
+name: iPASS MONEY
+primary: '#53B232'
+secondary: '#16181D'
+verified: 2026-06-22
+logo:
+  kind: favicon
+  url: https://static01-ipass.cdn.hinet.net/ipassweb/iPassWebV2/Content/style2018/img/core-img/logo.png
+paths:
+- ~/Desktop/ipassmoney(|/*)

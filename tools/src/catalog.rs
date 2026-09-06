@@ -142,6 +142,62 @@ pub fn build(dataset: &Path, root: &Path) -> Result<()> {
     Ok(())
 }
 
+/// 카탈로그 전체(또는 지정한 회사들)의 로고를 public/logo/ 에 받아 둔다.
+///
+/// 이렇게 해두면 어느 회사든 `enable` 한 번으로 즉시 켜진다 — 네트워크도, 출처가
+/// 막혀 실패할 위험도 없다. 원격 출처는 사라지거나 봇 차단으로 막히기 때문에
+/// (쿠팡이 그랬다) 받을 수 있을 때 받아 두는 편이 낫다.
+pub fn fetch_logos(root: &Path, only: &[String]) -> Result<()> {
+    let catalog: Catalog = serde_json::from_str(
+        &std::fs::read_to_string(root.join("catalog/brands.json"))?)?;
+    let committed = root.join("public/logo");
+    std::fs::create_dir_all(&committed)?;
+    let mut repository = LogoRepository::new(root.join("logos"), &committed);
+
+    let targets: Vec<&Entry> = catalog.brands.iter()
+        .filter(|entry| only.is_empty() || only.iter().any(|key| key == &entry.key))
+        .collect();
+    let total = targets.len();
+    let (mut done, mut skipped, mut failed) = (0usize, 0usize, 0usize);
+
+    for (index, entry) in targets.iter().enumerate() {
+        let target = committed.join(format!("{}.png", entry.key));
+        if target.exists() {
+            skipped += 1;
+            continue;
+        }
+        let Some(logo) = &entry.logo else { failed += 1; continue };
+        let brand = Brand {
+            key: entry.key.clone(), name: entry.name.clone(),
+            primary: entry.primary.clone(), secondary: entry.secondary.clone(),
+            paths: Vec::new(), verified: None, logo_path: None,
+            logo: Some(LogoSource { kind: logo.kind.clone(), url: logo.url.clone(),
+                                    keep_colour: false }),
+        };
+        match repository.prepare(&brand) {
+            Some(working) => {
+                std::fs::copy(&working, &target)?;
+                done += 1;
+            }
+            None => failed += 1,
+        }
+        if (index + 1) % 25 == 0 {
+            eprintln!("  … {}/{total}  받음 {done} · 실패 {failed}", index + 1);
+        }
+    }
+    println!("로고 수집 완료: 받음 {done} · 이미 있음 {skipped} · 실패 {failed} (전체 {total})");
+    if failed > 0 {
+        println!("\n실패 사유:");
+        for note in repository.notes.iter().take(40) {
+            println!("  {note}");
+        }
+        if repository.notes.len() > 40 {
+            println!("  … 외 {}건", repository.notes.len() - 40);
+        }
+    }
+    Ok(())
+}
+
 pub fn enable(keys: &[String], root: &Path) -> Result<()> {
     let catalog: Catalog = serde_json::from_str(
         &std::fs::read_to_string(root.join("catalog/brands.json"))?)?;

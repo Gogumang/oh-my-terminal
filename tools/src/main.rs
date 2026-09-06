@@ -3,6 +3,7 @@
 //!   build-themes              테마 생성 (기본)
 //!   build-themes catalog <경로>   oh-my-design 데이터셋 → catalog/brands.json
 //!   build-themes enable <키>...   카탈로그에서 회사를 골라 brands/ 에 추가
+//!   build-themes logos [<키>...]  카탈로그 로고를 public/logo/ 에 받아 둔다 (기본: 전체)
 
 mod application;
 mod domain;
@@ -66,6 +67,7 @@ fn main() -> Result<()> {
                 .ok_or_else(|| anyhow!("사용법: build-themes catalog <oh-my-design/design-md 경로>"))?;
             catalog::build(Path::new(dataset), &root)
         }
+        Some("logos") => catalog::fetch_logos(&root, &arguments[1..]),
         Some("enable") => {
             if arguments.len() < 2 {
                 return Err(anyhow!("사용법: build-themes enable <회사키>..."));

@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-06
+# 직접 고치지 말고 `build-themes enable dell` 을 다시 실행할 것.
+key: dell
+name: Dell
+primary: '#0076CE'
+secondary: '#16181D'
+verified: 2026-06-06
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/dell/000000
+paths:
+- ~/Desktop/dell(|/*)

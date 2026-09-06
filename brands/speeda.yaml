@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-17
+# 직접 고치지 말고 `build-themes enable speeda` 을 다시 실행할 것.
+key: speeda
+name: SPEEDA (Uzabase)
+primary: '#E60F3D'
+secondary: '#16181D'
+verified: 2026-06-17
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=jp.ub-speeda.com&sz=128
+paths:
+- ~/Desktop/speeda(|/*)

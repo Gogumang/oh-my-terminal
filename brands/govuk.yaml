@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-22
+# 직접 고치지 말고 `build-themes enable govuk` 을 다시 실행할 것.
+key: govuk
+name: GOV.UK
+primary: '#1D70B8'
+secondary: '#0B0C0C'
+verified: 2026-06-22
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=gov.uk&sz=128
+paths:
+- ~/Desktop/govuk(|/*)

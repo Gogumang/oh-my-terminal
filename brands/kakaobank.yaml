@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-12
+# 직접 고치지 말고 `build-themes enable kakaobank` 을 다시 실행할 것.
+key: kakaobank
+name: KakaoBank
+primary: '#FFE300'
+secondary: '#000000'
+verified: 2026-07-12
+logo:
+  kind: simpleicons
+  url: https://cdn.simpleicons.org/kakaotalk/000000
+paths:
+- ~/Desktop/kakaobank(|/*)

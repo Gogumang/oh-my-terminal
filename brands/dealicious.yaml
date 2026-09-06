@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-02
+# 직접 고치지 말고 `build-themes enable dealicious` 을 다시 실행할 것.
+key: dealicious
+name: Sinsang Market (Dealicious)
+primary: '#001339'
+secondary: '#16181D'
+verified: 2026-07-02
+logo:
+  kind: favicon
+  url: https://dealicious.kr/assets/images/deali_logo_square.png
+paths:
+- ~/Desktop/dealicious(|/*)

@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-10
+# 직접 고치지 말고 `build-themes enable 3o3` 을 다시 실행할 것.
+key: 3o3
+name: 3o3
+primary: '#0C64E6'
+secondary: '#16181D'
+verified: 2026-06-10
+logo:
+  kind: favicon
+  url: https://www.google.com/s2/favicons?domain=app.3o3.co.kr&sz=256
+paths:
+- ~/Desktop/3o3(|/*)

@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-11
+# 직접 고치지 말고 `build-themes enable laundrygo` 을 다시 실행할 것.
+key: laundrygo
+name: LaundryGo
+primary: '#0AC290'
+secondary: '#16181D'
+verified: 2026-06-11
+logo:
+  kind: favicon
+  url: https://www.laundrygo.com/wp-content/uploads/2022/12/favicon_web.png
+paths:
+- ~/Desktop/laundrygo(|/*)

@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-10
+# 직접 고치지 말고 `build-themes enable stores` 을 다시 실행할 것.
+key: stores
+name: STORES
+primary: '#0066FF'
+secondary: '#16181D'
+verified: 2026-06-10
+logo:
+  kind: github
+  url: https://github.com/heyinc.png?size=512
+paths:
+- ~/Desktop/stores(|/*)

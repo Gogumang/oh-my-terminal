@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-22
+# 직접 고치지 말고 `build-themes enable openpoint` 을 다시 실행할 것.
+key: openpoint
+name: OPENPOINT
+primary: '#8081FF'
+secondary: '#16181D'
+verified: 2026-06-22
+logo:
+  kind: favicon
+  url: https://www.openpoint.com.tw/cdn/images/openpoint-logo.png
+paths:
+- ~/Desktop/openpoint(|/*)

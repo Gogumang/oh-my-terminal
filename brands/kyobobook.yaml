@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-06-26
+# 직접 고치지 말고 `build-themes enable kyobobook` 을 다시 실행할 것.
+key: kyobobook
+name: Kyobo Book Centre
+primary: '#5055B1'
+secondary: '#16181D'
+verified: 2026-06-26
+logo:
+  kind: favicon
+  url: https://contents.kyobobook.co.kr/resources/fo/images/common/ink/favicon/favicon_256x256.png
+paths:
+- ~/Desktop/kyobobook(|/*)
