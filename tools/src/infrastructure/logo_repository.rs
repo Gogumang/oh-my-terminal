@@ -1,10 +1,14 @@
 //! 로고를 어디서 가져와 어떻게 다듬을지 아는 어댑터.
 //!
 //! 우선순위:
-//!   1. logos/<key>.color.png  — 사용자가 넣은 원본 컬러 로고 (실루엣이 불가능한 앱 아이콘)
-//!   2. logos/<key>.custom.png — 사용자가 넣은 실루엣용 로고
-//!   3. 원격 (Simple Icons / 파비콘 / GitHub 아바타)
-//! 사용자가 넣은 파일은 절대 덮어쓰지 않는다.
+//!   1. public/logo/<key>.png  — 저장소에 커밋된 완성 로고. 가공 없이 그대로 쓴다.
+//!   2. logos/<key>.color.png  — 원본 컬러로 가공할 소스 (실루엣이 불가능한 앱 아이콘)
+//!   3. logos/<key>.custom.png — 실루엣으로 가공할 소스
+//!   4. 원격 (Simple Icons / 파비콘 / GitHub 아바타)
+//!
+//! 1번이 있으면 빌드에 네트워크가 필요 없다. 원격 출처는 사라지거나 봇 차단으로 막히고
+//! (쿠팡이 그랬다), 파비콘은 해상도가 낮은 경우가 많아 결과가 흔들린다.
+//! 사용자가 넣은 파일은 어느 것도 덮어쓰지 않는다.
 
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -23,16 +27,28 @@ const USABLE_COVERAGE: (f64, f64) = (0.06, 0.70);
 
 pub struct LogoRepository {
     directory: PathBuf,
+    committed: PathBuf,
     pub notes: Vec<String>,
 }
 
 impl LogoRepository {
-    pub fn new(directory: impl AsRef<Path>) -> Self {
-        Self { directory: directory.as_ref().to_path_buf(), notes: Vec::new() }
+    pub fn new(directory: impl AsRef<Path>, committed: impl AsRef<Path>) -> Self {
+        Self { directory: directory.as_ref().to_path_buf(),
+               committed: committed.as_ref().to_path_buf(), notes: Vec::new() }
     }
 
     pub fn prepare(&mut self, brand: &Brand) -> Option<PathBuf> {
         let target = self.directory.join(format!("{}.png", brand.key));
+
+        // 커밋된 완성 로고가 있으면 그대로 쓴다 — 가공도 네트워크도 없다.
+        let committed = self.committed.join(format!("{}.png", brand.key));
+        if committed.exists() {
+            if let Err(error) = std::fs::copy(&committed, &target) {
+                self.notes.push(format!("{}: 커밋된 로고 복사 실패 ({error})", brand.name));
+                return None;
+            }
+            return Some(target);
+        }
 
         let colour_logo = self.directory.join(format!("{}.color.png", brand.key));
         if colour_logo.exists() {

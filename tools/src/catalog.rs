@@ -147,7 +147,7 @@ pub fn enable(keys: &[String], root: &Path) -> Result<()> {
         &std::fs::read_to_string(root.join("catalog/brands.json"))?)?;
     let index: BTreeMap<&str, &Entry> =
         catalog.brands.iter().map(|e| (e.key.as_str(), e)).collect();
-    let mut repository = LogoRepository::new(root.join("logos"));
+    let mut repository = LogoRepository::new(root.join("logos"), root.join("public/logo"));
 
     for key in keys {
         let Some(entry) = index.get(key.as_str()) else {

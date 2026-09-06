@@ -24,7 +24,7 @@ pub struct Report {
 
 pub fn run(root: &Path, base_font: &Path) -> Result<Report> {
     let catalog = YamlBrandCatalog::new(root.join("brands"), root.join("logos"));
-    let mut repository = LogoRepository::new(root.join("logos"));
+    let mut repository = LogoRepository::new(root.join("logos"), root.join("public/logo"));
 
     let mut brands = catalog.load()?;
     // 로고 파일은 상표라 저장소에 커밋하지 않는다 — 없으면 출처에서 받아 재현한다.

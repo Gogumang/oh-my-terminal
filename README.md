@@ -56,15 +56,23 @@ OH_MY_TERMINAL_BASE_FONT=~/Library/Fonts/D2Coding-Ver1.3.2-20180524-all.ttc \
 
 `brands/<회사>.yaml`의 `paths`를 고치면 어느 디렉터리에서 그 테마를 쓸지 바꿀 수 있습니다.
 
-## 로고를 직접 넣기
+## 로고
+
+완성된 로고는 `public/logo/<회사>.png`에 커밋되어 있고 빌더가 그대로 씁니다 —
+**빌드에 네트워크가 필요 없습니다.** 원격 출처는 사라지거나 봇 차단으로 막히고
+(쿠팡이 그랬습니다), 파비콘은 해상도가 낮아 결과가 흔들립니다.
+
+로고를 바꾸려면 `public/logo/<회사>.png`를 교체하면 됩니다 (512×512 PNG, 알파 포함).
+새 회사를 추가할 때 `public/logo/`에 파일이 없으면 `brands/<회사>.yaml`의 출처에서
+내려받아 가공합니다. 그 가공 방식을 고르려면:
 
 | 파일 | 처리 |
 |---|---|
 | `logos/<회사>.custom.png` | 형태만 쓰고 브랜드 색으로 자동 착색 |
 | `logos/<회사>.color.png` | 원본 색 유지 (모서리 배경은 자동 제거) |
 
-둘 다 임포터가 덮어쓰지 않습니다. 색 면에서 글자를 파낸 앱 아이콘은 실루엣으로 만들면
-형태가 사라지므로 `.color.png`를 쓰세요.
+색 면에서 글자를 파낸 앱 아이콘(배민·쿠팡·NOL)은 실루엣으로 만들면 형태가 사라지므로
+`.color.png`를 씁니다.
 
 ## 설계 노트
 
@@ -94,7 +102,8 @@ OH_MY_TERMINAL_BASE_FONT=~/Library/Fonts/D2Coding-Ver1.3.2-20180524-all.ttc \
 brands.zsh, fonts/, iterm2/   생성물 — 커밋됨. 사용자는 이것만 있으면 됩니다
 brands/*.yaml                 켜둔 회사 정의
 catalog/brands.json           440개 회사 카탈로그 (언어 중립)
-logos/                        로고 원본
+public/logo/                  완성된 로고 (커밋됨)
+logos/                        빌드 작업물
 tools/                        빌드 (메인테이너 전용, Rust)
   src/domain/                   모델·팔레트 계산 (외부 의존 없음)
   src/application/              유스케이스 조립
@@ -120,6 +129,6 @@ tools/                        빌드 (메인테이너 전용, Rust)
 ## 라이선스
 
 MIT. 브랜드 색 데이터는 [oh-my-design](https://github.com/kwakseongjae/oh-my-design)(MIT)에서
-가져왔습니다. 로고는 각 회사의 상표입니다. `logos/*.png`는 커밋하지 않고 빌드 시 공개 출처
-(Simple Icons·파비콘)에서 내려받지만, **생성된 폰트에는 로고 이미지가 글리프로 포함됩니다** —
-sbix는 PNG를 그대로 담는 포맷이기 때문입니다.
+가져왔습니다. 로고는 각 회사의 상표이며 `public/logo/`에 커밋되어 있습니다. 생성된 폰트에도 같은
+이미지가 글리프로 들어갑니다 — sbix는 PNG를 그대로 담는 포맷이기 때문입니다.
+출처는 각 회사의 공개 자산(Simple Icons·공식 파비콘)이며 `brands/*.yaml`에 기록돼 있습니다.
