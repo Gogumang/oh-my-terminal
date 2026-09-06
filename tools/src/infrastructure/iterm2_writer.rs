@@ -72,14 +72,10 @@ pub fn write_profiles(brands: &[Brand], font_postscript: Option<&str>,
         }
         mode_entries(&mut profile, "Dark", &dark);
         mode_entries(&mut profile, "Light", &light);
-        if let Some(path) = &brand.logo_path {
-            let absolute = std::fs::canonicalize(path)?.to_string_lossy().to_string();
-            profile.insert("Background Image Location".into(), json!(absolute));
-            profile.insert("Background Image Mode".into(), json!(3));  // aspect fit
-            profile.insert("Blend".into(), json!(0.08));               // 워터마크 수준
-            profile.insert("Icon".into(), json!(2));                   // custom
-            profile.insert("Custom Icon Path".into(), json!(absolute));
-        }
+        // 배경 워터마크와 탭 아이콘은 넣지 않는다.
+        // 이 두 키는 로고 PNG의 절대경로를 요구하는데, 그 경로는 빌드한 머신에만 존재한다.
+        // 산출물을 커밋해 배포하는 구조에서 다른 사람이 clone하면 없는 파일을 가리키게 된다.
+        // 로고는 프롬프트 글리프(폰트)로 보여주므로 기능 손실은 워터마크뿐이다.
         profiles.push(Value::Object(profile));
     }
 

@@ -4,9 +4,15 @@
 #  ~/.p10k.zsh 를 source 한 '뒤에' 이 파일을 source 해야 한다.
 # ─────────────────────────────────────────────────────────────────────────────
 
+autoload -Uz add-zsh-hook
+
+typeset -g  _brand_dir_content=""
 typeset -gA _brand_gradient_cache=()
 
 # 터미널은 그라데이션을 모른다 — 글자마다 배경색을 조금씩 바꿔 흉내낸다.
+# 결과를 REPLY에 넣는다. 예전에는 호출부가 $( )로 감쌌는데, 그러면 함수가 서브셸에서
+# 돌아 캐시에 쓴 값이 부모로 돌아오지 않는다 — 캐시가 한 번도 히트하지 않았고
+# 프롬프트를 그릴 때마다 fork + 전체 재계산이었다.
 _brand_gradient() {
   local text=$1 start=$2 end=$3 dark_fg=$4 light_fg=$5
   local -i n=${#text} i
@@ -24,26 +30,39 @@ _brand_gradient() {
     [[ $fg == $previous_fg ]] || { printf -v out '%s%%F{%s}' "$out" "$fg"; previous_fg=$fg }
     out+="${text[i]}"
   done
-  print -r -- "$out"
+  REPLY=$out
 }
 
-# 경로는 P9K_CONTENT에서 받지 않는다. p10k가 두 번째 프롬프트부터 '이미 확장된' 값을
-# 그 변수에 담아, 우리가 넣은 %K{...} 위에 색이 또 입혀지는 이중 적용이 일어난다
-# (프롬프트에 리터럴 %K{ 가 그대로 찍혔다). $PWD 기반으로 직접 만든다.
-_brand_gradient_cached() {
-  local text="$1${(%):-%~}"
-  local key="$text|$2|$3|$4|$5"
-  [[ -n ${_brand_gradient_cache[$key]} ]] || \
-    _brand_gradient_cache[$key]=$(_brand_gradient "$text" "$2" "$3" "$4" "$5")
-  print -r -- ${_brand_gradient_cache[$key]}
+# 디렉터리가 바뀔 때 한 번만 굽는다. 프롬프트는 변수만 참조하므로 fork가 없다.
+# 경로는 p10k의 P9K_CONTENT에서 받지 않는다 — 두 번째 프롬프트부터 '이미 확장된' 값이
+# 들어와 우리가 넣은 %K{...} 위에 색이 또 입혀졌다 (프롬프트에 리터럴 %K{ 가 찍혔다).
+_brand_apply() {
+  local start end dark light icon
+  case $PWD in
+__BRAND_APPLY_CASES__
+    *) _brand_dir_content=""; return ;;
+  esac
+  local text="${icon}${(%):-%~}"
+  local key="$text|$start|$end"
+  if [[ -n ${_brand_gradient_cache[$key]} ]]; then
+    _brand_dir_content=${_brand_gradient_cache[$key]}
+  else
+    _brand_gradient "$text" "$start" "$end" "$dark" "$light"
+    _brand_dir_content=$REPLY
+    _brand_gradient_cache[$key]=$REPLY
+  fi
 }
+add-zsh-hook chpwd _brand_apply
+_brand_apply
 
 # 프롬프트 첫 칸. 회사 폴더 안에서는 비워 칸 자체를 숨기고(로고는 경로 세그먼트가 그린다),
 # 밖에서는 원래의 OS 아이콘을 보여준다.
 # case 패턴에 ~ 를 쓰면 zsh가 틸드 확장을 해버려 절대 안 맞는다 — $PWD로 비교한다.
+# 이 세그먼트만은 fork를 피할 수 없다: p10k가 os_icon을 정적으로 캐싱해 변수 참조로는
+# 디렉터리 변경이 반영되지 않는다(확인함). 커스텀 세그먼트는 매 프롬프트 재실행된다.
 _brand_logo_segment() {
   case $PWD in
 __BRAND_CASES__
   esac
-  print -rn -- $''
+  print -rn -- $'\uf179'
 }

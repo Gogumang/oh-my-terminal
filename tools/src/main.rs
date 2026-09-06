@@ -33,13 +33,27 @@ fn project_root() -> Result<PathBuf> {
     }
 }
 
+/// 로고 글리프를 얹을 기반 폰트.
+///
+/// 예전에는 MesloLGS NF로 못박아 뒀는데, 브랜드 프로필이 그 폰트를 주 폰트로 지정하므로
+/// 한글 폰트(D2Coding 등)를 쓰던 사용자는 회사 폴더에서 한글이 시스템 폴백으로 떨어졌다.
+/// 지금 쓰는 폰트를 그대로 패치해야 원래 보던 글자가 유지된다.
+///   OH_MY_TERMINAL_BASE_FONT=/path/to/Font.ttf 로 지정
 fn base_font() -> Result<PathBuf> {
-    let path = PathBuf::from(std::env::var("HOME")?).join("Library/Fonts/MesloLGS NF Regular.ttf");
-    if !path.exists() {
-        return Err(anyhow!("기반 폰트가 없다: {}\n  \
-            p10k 권장 폰트(MesloLGS NF)를 먼저 설치할 것: p10k configure", path.display()));
+    if let Ok(configured) = std::env::var("OH_MY_TERMINAL_BASE_FONT") {
+        let path = PathBuf::from(configured);
+        if !path.exists() {
+            return Err(anyhow!("지정한 기반 폰트가 없다: {}", path.display()));
+        }
+        return Ok(path);
     }
-    Ok(path)
+    let fonts = PathBuf::from(std::env::var("HOME")?).join("Library/Fonts");
+    let fallback = fonts.join("MesloLGS NF Regular.ttf");
+    if fallback.exists() {
+        return Ok(fallback);
+    }
+    Err(anyhow!("기반 폰트를 찾지 못했다. OH_MY_TERMINAL_BASE_FONT 로 지정하거나 \
+        p10k 권장 폰트를 설치할 것 (p10k configure)"))
 }
 
 fn main() -> Result<()> {

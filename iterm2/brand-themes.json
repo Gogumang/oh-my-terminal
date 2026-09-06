@@ -239,8 +239,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/baemin.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.827450980392157,
@@ -258,7 +256,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Baemin",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.827450980392157,
@@ -287,7 +284,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/baemin.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -304,7 +300,6 @@
         "Red Component": 0.15
       },
       "Guid": "0726C754-7367-5DE6-F400-F40038F8F443",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.827450980392157,
@@ -603,8 +598,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/banksalad.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.49411764705882355,
@@ -622,7 +615,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Banksalad",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.49411764705882355,
@@ -651,7 +643,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/banksalad.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -668,7 +659,6 @@
         "Red Component": 0.15
       },
       "Guid": "0339FC8B-819A-52AE-892F-892FB9AACFA4",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.49411764705882355,
@@ -967,8 +957,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/coupang.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.49000000000000027,
@@ -986,7 +974,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Coupang",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.49000000000000027,
@@ -1015,7 +1002,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/coupang.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -1032,7 +1018,6 @@
         "Red Component": 0.15
       },
       "Guid": "514E1260-BE1B-5826-B7FD-37FD97BA119A",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.49000000000000027,
@@ -1331,8 +1316,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/kakao.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.0,
@@ -1350,7 +1333,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Kakao",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.0,
@@ -1379,7 +1361,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/kakao.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -1396,7 +1377,6 @@
         "Red Component": 0.15
       },
       "Guid": "0F7B3BA2-BEDA-5C78-9DBF-9DBFF91D8D0E",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.0,
@@ -1695,8 +1675,6 @@
         "Green Component": 0.968695652173913,
         "Red Component": 0.968695652173913
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/karrot.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.21176470588235285,
@@ -1714,7 +1692,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Karrot",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.21176470588235285,
@@ -1743,7 +1720,6 @@
         "Green Component": 0.968695652173913,
         "Red Component": 0.968695652173913
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/karrot.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -1760,7 +1736,6 @@
         "Red Component": 0.14347826086956522
       },
       "Guid": "7006165B-4D96-55A9-8496-84969483B406",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.21176470588235285,
@@ -2059,8 +2034,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/line.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.3333333333333336,
@@ -2078,7 +2051,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "LINE",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.3333333333333336,
@@ -2107,7 +2079,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/line.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -2124,7 +2095,6 @@
         "Red Component": 0.15
       },
       "Guid": "E6DB9B62-F7CC-56D2-8D10-0D100704C769",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.3333333333333336,
@@ -2423,8 +2393,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/musinsa.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.49000000000000027,
@@ -2442,7 +2410,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Musinsa",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.49000000000000027,
@@ -2471,7 +2438,6 @@
         "Green Component": 0.97,
         "Red Component": 0.97
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/musinsa.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -2488,7 +2454,6 @@
         "Red Component": 0.15
       },
       "Guid": "AAE6E4F2-CAA3-58BD-C0D7-C0D7DF479F70",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.49000000000000027,
@@ -2787,8 +2752,6 @@
         "Green Component": 0.968235294117647,
         "Red Component": 0.9658823529411764
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/naver.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 0.3529411764705882,
@@ -2806,7 +2769,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Naver",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.3529411764705882,
@@ -2835,7 +2797,6 @@
         "Green Component": 0.968235294117647,
         "Red Component": 0.9658823529411764
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/naver.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -2852,7 +2813,6 @@
         "Red Component": 0.12941176470588237
       },
       "Guid": "17F1A470-B3BB-5C1A-EEE4-EEE4FEE5335B",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 0.3529411764705882,
@@ -3151,8 +3111,6 @@
         "Green Component": 0.9662499999999999,
         "Red Component": 0.9624999999999999
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/nol.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 1.0,
@@ -3170,7 +3128,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "NOL",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 1.0,
@@ -3199,7 +3156,6 @@
         "Green Component": 0.9662499999999999,
         "Red Component": 0.9624999999999999
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/nol.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -3216,7 +3172,6 @@
         "Red Component": 0.11250000000000007
       },
       "Guid": "6CDE7D46-2255-530F-F3AF-F3AF33E96454",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 1.0,
@@ -3515,8 +3470,6 @@
         "Green Component": 0.9686764705882352,
         "Red Component": 0.9633823529411766
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/socar.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 1.0,
@@ -3534,7 +3487,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "SOCAR",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 1.0,
@@ -3563,7 +3515,6 @@
         "Green Component": 0.9686764705882352,
         "Red Component": 0.9633823529411766
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/socar.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -3580,7 +3531,6 @@
         "Red Component": 0.11691176470588233
       },
       "Guid": "9CA49619-D5BC-517F-D5F6-D5F69CF760AA",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 1.0,
@@ -3879,8 +3829,6 @@
         "Green Component": 0.9686153846153845,
         "Red Component": 0.9630769230769229
       },
-      "Background Image Location": "/Users/sinseongsu/Desktop/code/iterm2/logos/toss.png",
-      "Background Image Mode": 3,
       "Badge Color (Dark)": {
         "Alpha Component": 0.45,
         "Blue Component": 1.0,
@@ -3898,7 +3846,6 @@
       "Badge Max Height": 0.15,
       "Badge Max Width": 0.3,
       "Badge Text": "Toss",
-      "Blend": 0.08,
       "Cursor Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 1.0,
@@ -3927,7 +3874,6 @@
         "Green Component": 0.9686153846153845,
         "Red Component": 0.9630769230769229
       },
-      "Custom Icon Path": "/Users/sinseongsu/Desktop/code/iterm2/logos/toss.png",
       "Draw Powerline Glyphs": true,
       "Foreground Color (Dark)": {
         "Alpha Component": 1.0,
@@ -3944,7 +3890,6 @@
         "Red Component": 0.11538461538461536
       },
       "Guid": "7B54B673-050E-5128-9CE0-1CE0CC2C1389",
-      "Icon": 2,
       "Link Color (Dark)": {
         "Alpha Component": 1.0,
         "Blue Component": 1.0,

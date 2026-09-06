@@ -27,7 +27,7 @@ exec zsh
 
 | 계층 | 담당 | 파일 |
 |---|---|---|
-| iTerm2 프로필 | ANSI 16색, 배경 로고, 탭 색, 뱃지, 라이트/다크 | `iterm2/brand-themes.json` |
+| iTerm2 프로필 | ANSI 16색, 탭 색, 뱃지, 라이트/다크 | `iterm2/brand-themes.json` |
 | zsh 프롬프트 | 경로 세그먼트의 브랜드 그라데이션 | `brands.zsh` |
 | 폰트 | 로고 글리프 (PUA 코드포인트) | `fonts/*.ttf` |
 
@@ -42,6 +42,14 @@ exec zsh
 cd tools && cargo build --release && cd ..
 tools/target/release/build-themes enable coupang line socar
 tools/target/release/build-themes
+```
+
+**기반 폰트를 지정하세요.** 로고 글리프는 기존 폰트에 얹히므로, 지금 쓰는 폰트를
+그대로 패치해야 한글 등이 유지됩니다:
+
+```sh
+OH_MY_TERMINAL_BASE_FONT=~/Library/Fonts/D2Coding-Ver1.3.2-20180524-all.ttc \
+  tools/target/release/build-themes
 ```
 
 빌더는 Rust입니다. `cargo build --release` 하나면 되고 다른 의존성이 없습니다.
@@ -95,8 +103,22 @@ tools/                        빌드 (메인테이너 전용, Rust)
 
 도메인은 어떤 레이어에도 의존하지 않고, 어댑터가 포트를 구현합니다.
 
+## 알려진 제약
+
+- **배경 워터마크와 탭 아이콘은 넣지 않습니다.** 두 키가 로고 PNG의 절대경로를 요구하는데
+  그 경로는 빌드한 머신에만 존재해, 산출물을 커밋해 배포하는 구조와 맞지 않습니다.
+  로고는 프롬프트 글리프로 보여줍니다.
+- **회사 폴더 안에서는 p10k의 경로 축약(`truncate_to_unique` 등)이 적용되지 않습니다.**
+  프롬프트가 p10k의 축약 결과를 되받으면 색이 이중으로 입혀져 깨지기 때문에 `%~`로
+  직접 만듭니다. 깊은 경로에서 프롬프트가 길어질 수 있습니다.
+- **iTerm2의 GPU(Metal) 렌더러에서 로고가 단색이 될 수 있습니다.** iTerm2 소스상 컬러 폰트
+  판별이 `Apple Color Emoji` 이름 비교로 되어 있어, 커스텀 sbix 폰트는 알파만 남는 경로를
+  탈 수 있습니다. 단색으로 보이면 GPU 렌더링을 끄거나 리거처를 켜 레거시 경로를 쓰세요.
+  (소스 기반 추론이며 실행 검증은 하지 않았습니다.)
+
 ## 라이선스
 
 MIT. 브랜드 색 데이터는 [oh-my-design](https://github.com/kwakseongjae/oh-my-design)(MIT)에서
-가져왔습니다. **로고는 각 회사의 상표이며 이 저장소는 로고 파일을 커밋하지 않습니다** —
-빌드 시 각 회사의 공개 출처(Simple Icons·파비콘)에서 내려받습니다.
+가져왔습니다. 로고는 각 회사의 상표입니다. `logos/*.png`는 커밋하지 않고 빌드 시 공개 출처
+(Simple Icons·파비콘)에서 내려받지만, **생성된 폰트에는 로고 이미지가 글리프로 포함됩니다** —
+sbix는 PNG를 그대로 담는 포맷이기 때문입니다.
