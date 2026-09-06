@@ -17,8 +17,8 @@ _brand_gradient() {
     local -F t=$(( n > 1 ? (i - 1.0) / (n - 1.0) : 0 ))
     local -i r=$(( sr + (er - sr) * t )) g=$(( sg + (eg - sg) * t )) b=$(( sb + (eb - sb) * t ))
     # 배경이 어두워지는 지점에서 글자색을 뒤집지 않으면 경로 끝이 안 읽힌다.
-    local -i luma=$(( (r * 299 + g * 587 + b * 114) / 1000 ))
-    local fg=$(( luma > 140 ? 1 : 2 ))
+    local -i luma=$(( (r * __LUMA_R__ + g * __LUMA_G__ + b * __LUMA_B__) / 1000 ))
+    local fg=$(( luma > __LUMA_SWITCH__ ? 1 : 2 ))
     fg=${${fg/1/$dark_fg}/2/$light_fg}
     printf -v out '%s%%K{#%02X%02X%02X}' "$out" $r $g $b
     [[ $fg == $previous_fg ]] || { printf -v out '%s%%F{%s}' "$out" "$fg"; previous_fg=$fg }

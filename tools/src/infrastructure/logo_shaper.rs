@@ -10,6 +10,8 @@ use image::{imageops, Rgba, RgbaImage};
 const BACKGROUND_TOLERANCE: i32 = 28;
 const CORNER_TOLERANCE: i32 = 32;
 const FAINT_ALPHA: u8 = 30;
+/// 이보다 불투명하면 그림이 아니라 배경 사각형이 깔린 것으로 본다.
+const OPAQUE_ENOUGH_TO_BE_BACKGROUND: f64 = 0.95;
 
 pub fn alpha_coverage(image: &RgbaImage) -> f64 {
     let opaque = image.pixels().filter(|p| p.0[3] > FAINT_ALPHA).count();
@@ -60,10 +62,17 @@ fn corners(image: &RgbaImage) -> [Rgba<u8>; 4] {
      *image.get_pixel(1, h - 2), *image.get_pixel(w - 2, h - 2)]
 }
 
-/// 네 모서리가 같은 불투명 색이면 그 색을 배경으로 보고 지운다.
+/// 배경 사각형을 걷어내야 하는 이미지인지 판단한다.
 ///
-/// 주의: 알파가 이미 정확한 이미지에는 쓰면 안 된다. 로고 획이 네 모서리에 닿으면
-/// (네이버 N) 로고 자체를 배경으로 오인해 통째로 지운다.
+/// `strip_uniform_background`는 무조건 지우므로, 알파가 이미 정확한 이미지에 부르면
+/// 획이 네 모서리에 닿는 로고(네이버의 굵은 N)를 배경으로 오인해 통째로 지운다.
+/// 배경을 <rect>로 꽉 칠한 이미지만 거의 불투명하다는 성질로 구분한다.
+pub fn needs_background_strip(image: &RgbaImage) -> bool {
+    alpha_coverage(image) > OPAQUE_ENOUGH_TO_BE_BACKGROUND
+}
+
+/// 네 모서리가 같은 불투명 색이면 그 색을 배경으로 보고 지운다.
+/// 부르기 전에 `needs_background_strip`으로 걸러야 한다.
 pub fn strip_uniform_background(image: &RgbaImage) -> RgbaImage {
     let marks = corners(image);
     if marks.iter().any(|p| p.0[3] < 200) {
@@ -84,7 +93,7 @@ pub fn strip_uniform_background(image: &RgbaImage) -> RgbaImage {
     result
 }
 
-fn flood_clear(mask: &mut Vec<bool>, width: u32, height: u32, start: (u32, u32),
+fn flood_clear(mask: &mut [bool], width: u32, height: u32, start: (u32, u32),
                keep: &dyn Fn(u32, u32) -> bool) {
     let index = |x: u32, y: u32| (y * width + x) as usize;
     if !mask[index(start.0, start.1)] { return; }
@@ -107,7 +116,9 @@ pub fn clear_corner_background(image: &RgbaImage) -> RgbaImage {
     let (width, height) = (image.width(), image.height());
     let bright = |x: u32, y: u32| {
         let p = image.get_pixel(x, y).0;
-        let luma = (p[0] as i32 * 299 + p[1] as i32 * 587 + p[2] as i32 * 114) / 1000;
+        let weights = crate::domain::palette::LUMA_WEIGHTS;
+        let luma = (p[0] as i32 * weights[0] + p[1] as i32 * weights[1]
+                    + p[2] as i32 * weights[2]) / 1000;
         luma > 255 - CORNER_TOLERANCE
     };
     let mut mask: Vec<bool> = (0..width * height)
@@ -155,4 +166,86 @@ pub fn tint(image: &RgbaImage, colour: [u8; 3]) -> RgbaImage {
         result.put_pixel(x, y, Rgba([colour[0], colour[1], colour[2], pixel.0[3]]));
     }
     result
+}
+
+#[cfg(test)]
+#[allow(non_snake_case)]   // 테스트 이름은 동작 서술형 한국어를 쓴다
+mod tests {
+    use super::*;
+
+    /// 지정한 좌표만 불투명한 정사각 이미지.
+    fn image_with(size: u32, opaque: &dyn Fn(u32, u32) -> bool) -> RgbaImage {
+        let mut image = RgbaImage::new(size, size);
+        for (x, y, pixel) in image.enumerate_pixels_mut() {
+            *pixel = Rgba([255, 255, 255, if opaque(x, y) { 255 } else { 0 }]);
+        }
+        image
+    }
+
+    #[test]
+    fn 모서리에_닿는_로고는_배경_제거_대상이_아니라고_판단한다() {
+        // 네이버의 굵은 N은 획이 네 모서리에 전부 닿는다. 배경 제거를 태우면
+        // 로고가 통째로 지워진다 — 이번 프로젝트에서 실제로 겪은 회귀다.
+        // 방어선은 strip_uniform_background 안이 아니라 이 판단에 있다.
+        let logo = image_with(16, &|x, y| x == y || x < 2 || x > 13);
+        assert!(alpha_coverage(&logo) < 0.95, "픽스처가 로고답지 않다");
+        assert!(!needs_background_strip(&logo), "로고를 배경 제거 대상으로 판단했다");
+
+        // 반대로 배경을 꽉 칠한 이미지는 대상이다.
+        let filled = RgbaImage::from_pixel(16, 16, Rgba([0, 0, 0, 255]));
+        assert!(needs_background_strip(&filled), "배경 사각형을 못 알아봤다");
+    }
+
+    #[test]
+    fn 네_모서리가_같은_불투명색이면_배경으로_보고_지운다() {
+        let mut image = RgbaImage::from_pixel(16, 16, Rgba([255, 255, 255, 255]));
+        for x in 6..10 {
+            for y in 6..10 {
+                image.put_pixel(x, y, Rgba([0, 0, 0, 255]));
+            }
+        }
+        let stripped = strip_uniform_background(&image);
+        assert_eq!(stripped.get_pixel(0, 0).0[3], 0, "흰 배경이 남았다");
+        assert_eq!(stripped.get_pixel(7, 7).0[3], 255, "안쪽 마크가 지워졌다");
+    }
+
+    #[test]
+    fn 반전은_바깥이_아니라_파낸_구멍만_남긴다() {
+        // 단순히 알파를 뒤집으면 로고 '바깥'까지 불투명해져 테두리 프레임이 생긴다.
+        // 구멍은 '갇혀' 있어야 한다. 바깥과 이어진 틈은 flood fill이 지우는 게 정상이다.
+        let disc = image_with(16, &|x, y| {
+            let (dx, dy) = (x as i32 - 8, y as i32 - 8);
+            let inside_disc = dx * dx + dy * dy < 36;
+            let inside_hole = (7..=9).contains(&x) && (7..=9).contains(&y);
+            inside_disc && !inside_hole
+        });
+        let inverted = invert_alpha(&disc);
+        assert_eq!(inverted.get_pixel(0, 0).0[3], 0, "바깥이 불투명해져 프레임이 생겼다");
+        assert_eq!(inverted.get_pixel(8, 8).0[3], 255, "파낸 구멍이 남지 않았다");
+    }
+
+    #[test]
+    fn 모서리에서_번진_밝은_배경만_지우고_안쪽_흰_글자는_남긴다() {
+        // JPEG 앱 아이콘은 둥근 모서리 바깥이 흰색이다. 흰색을 전부 지우면
+        // 로고 안쪽의 흰 글자까지 사라진다 (배민이 그랬다).
+        let mut image = RgbaImage::from_pixel(16, 16, Rgba([255, 255, 255, 255]));
+        for x in 3..13 {
+            for y in 3..13 {
+                image.put_pixel(x, y, Rgba([12, 200, 180, 255]));   // 브랜드색 면
+            }
+        }
+        image.put_pixel(8, 8, Rgba([255, 255, 255, 255]));           // 안쪽 흰 글자
+        let cleared = clear_corner_background(&image);
+        assert_eq!(cleared.get_pixel(0, 0).0[3], 0, "모서리 흰 배경이 남았다");
+        assert_eq!(cleared.get_pixel(8, 8).0[3], 255, "안쪽 흰 글자가 지워졌다");
+    }
+
+    #[test]
+    fn fit은_작은_이미지를_확대한다() {
+        // thumbnail처럼 축소만 하면 16x16 파비콘이 캔버스 한가운데 점으로 남는다.
+        let tiny = RgbaImage::from_pixel(4, 4, Rgba([255, 255, 255, 255]));
+        let fitted = fit(&tiny, 64);
+        assert_eq!(fitted.dimensions(), (64, 64));
+        assert!(alpha_coverage(&fitted) > 0.9, "확대되지 않았다");
+    }
 }

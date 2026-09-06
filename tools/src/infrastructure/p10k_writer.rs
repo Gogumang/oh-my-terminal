@@ -55,8 +55,15 @@ pub fn write_prompt(brands: &[Brand], glyphs: &BTreeMap<String, char>,
         blocks.push(lines.join("\n"));
     }
 
-    let runtime = RUNTIME.replace("__BRAND_CASES__",
-        &if cases.is_empty() { "    # (로고 없음)".to_string() } else { cases.join("\n") });
+    // 셸 쪽 임계값·가중치를 도메인 상수에서 주입한다. 리터럴로 두면 Rust만 바꿨을 때
+    // 검증은 통과하고 화면은 안 읽히는 상태가 조용히 만들어진다.
+    let runtime = RUNTIME
+        .replace("__BRAND_CASES__",
+                 &if cases.is_empty() { "    # (로고 없음)".to_string() } else { cases.join("\n") })
+        .replace("__LUMA_SWITCH__", &palette::LUMA_SWITCH.to_string())
+        .replace("__LUMA_R__", &palette::LUMA_WEIGHTS[0].to_string())
+        .replace("__LUMA_G__", &palette::LUMA_WEIGHTS[1].to_string())
+        .replace("__LUMA_B__", &palette::LUMA_WEIGHTS[2].to_string());
 
     let document = format!("{runtime}
 typeset -g POWERLEVEL9K_DIR_CLASSES=(

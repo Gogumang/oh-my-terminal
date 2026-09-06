@@ -14,9 +14,15 @@ pub const CONTRAST_ACCENT: f64 = 4.5;
 /// 터미널 다크 배경(#121212 근처)의 상대 휘도.
 const TERMINAL_BACKGROUND_LUMINANCE: f64 = 0.008;
 
-/// 셸(brands.zsh)이 글자색을 전환하는 기준. 여기 값과 zsh 쪽이 반드시 같아야 한다 —
-/// 다르면 "검증은 통과했는데 실제로는 안 읽히는" 상태가 된다.
+/// 셸(brands.zsh)이 글자색을 전환하는 기준.
+///
+/// 이 값과 BT.601 가중치는 생성 시 zsh 템플릿에 주입된다(p10k_writer). 예전에는 양쪽에
+/// 리터럴로 박아두고 "반드시 같아야 한다"는 주석만 달았는데, 강제하는 것이 없어
+/// Rust 상수만 바꾸면 검증은 통과하고 화면은 안 읽히는 상태가 만들어졌다.
 pub const LUMA_SWITCH: i32 = 140;
+
+/// 밝기 계산 가중치 (ITU-R BT.601). 셸과 이미지 처리가 같은 값을 써야 한다.
+pub const LUMA_WEIGHTS: [i32; 3] = [299, 587, 114];
 
 const GRADIENT_DEPTHS: [f64; 8] = [0.55, 0.45, 0.35, 0.28, 0.22, 0.17, 0.12, 0.08];
 
@@ -132,7 +138,8 @@ pub fn segment_background(brand: &Brand) -> (Rgb, bool) {
 /// 셸이 쓰는 것과 같은 정수 밝기 계산 (ITU-R BT.601 근사).
 fn luma_255(rgb: Rgb) -> i32 {
     let to255 = |c: f64| (c * 255.0).round() as i32;
-    (to255(rgb[0]) * 299 + to255(rgb[1]) * 587 + to255(rgb[2]) * 114) / 1000
+    (to255(rgb[0]) * LUMA_WEIGHTS[0] + to255(rgb[1]) * LUMA_WEIGHTS[1]
+        + to255(rgb[2]) * LUMA_WEIGHTS[2]) / 1000
 }
 
 pub struct Gradient {
@@ -234,4 +241,96 @@ pub fn terminal_palette(brand: &Brand) -> (ModePalette, ModePalette) {
         }
     };
     (build(0.07, &ANSI_DARK, true), build(0.97, &ANSI_LIGHT, false))
+}
+
+#[cfg(test)]
+#[allow(non_snake_case)]   // 테스트 이름은 동작 서술형 한국어를 쓴다
+mod tests {
+    use super::*;
+
+    fn brand(primary: &str, secondary: &str) -> Brand {
+        Brand { key: "t".into(), name: "T".into(), primary: primary.into(),
+                secondary: secondary.into(), paths: vec![], logo: None,
+                verified: None, logo_path: None }
+    }
+
+    #[test]
+    fn 헥스_변환은_왕복한다() {
+        for value in ["#000000", "#FEE500", "#0064FF", "#FFFFFF"] {
+            assert_eq!(rgb_to_hex(hex_to_rgb(value)), value, "왕복 실패: {value}");
+        }
+    }
+
+    #[test]
+    fn 흑백_대비는_WCAG_최대값_21이다() {
+        let ratio = contrast_ratio(hex_to_rgb("#FFFFFF"), hex_to_rgb("#000000"));
+        assert!((ratio - 21.0).abs() < 0.01, "흑백 대비가 21:1이 아니다: {ratio}");
+    }
+
+    #[test]
+    fn hls_변환은_왕복한다() {
+        for value in ["#FEE500", "#03C75A", "#0064FF", "#808080"] {
+            let original = hex_to_rgb(value);
+            let (hue, lightness, saturation) = rgb_to_hls(original);
+            let restored = hls_to_rgb(hue, lightness, saturation);
+            assert_eq!(rgb_to_hex(restored), value, "HLS 왕복 실패: {value}");
+        }
+    }
+
+    #[test]
+    fn push_to_contrast는_달성_실패를_숨기지_않는다() {
+        let background = hex_to_rgb("#FFFFFF");
+        // 흰 배경에서 더 밝게 밀면 목표에 닿을 수 없다 — 조용히 최대치를 주는 대신
+        // false를 함께 돌려줘야 한다. 이걸 숨기면 "대비 보장" 약속이 거짓이 된다.
+        let (_, reached) = push_to_contrast(hex_to_rgb("#EEEEEE"), background, 7.0, true);
+        assert!(!reached, "달성 실패를 true로 보고했다");
+
+        let (colour, reached) = push_to_contrast(hex_to_rgb("#888888"), background, 7.0, false);
+        assert!(reached, "어둡게 밀면 달성 가능한데 실패로 보고했다");
+        assert!(contrast_ratio(colour, background) >= 7.0);
+    }
+
+    #[test]
+    fn 모든_그라데이션_구간에서_셸이_고른_글자색이_읽힌다() {
+        // 셸은 배경 밝기로 한쪽 색만 고른다. 두 색의 max를 재면 실제로 쓰이지 않는 색
+        // 덕분에 통과해버려, 검증은 녹색인데 화면은 안 읽히는 상태가 된다 (실제 겪은 회귀).
+        for (primary, secondary) in [("#FEE500", "#333333"), ("#0064FF", "#191F28"),
+                                     ("#0078FF", "#354153"), ("#000000", "#000000")] {
+            let subject = brand(primary, secondary);
+            let gradient = gradient(&subject);
+            for step in 0..=8 {
+                let stop = blend(gradient.start, gradient.end, step as f64 / 8.0);
+                let chosen = if luma_255(stop) > LUMA_SWITCH {
+                    gradient.dark_foreground
+                } else {
+                    gradient.light_foreground
+                };
+                let ratio = contrast_ratio(chosen, stop);
+                assert!(ratio >= CONTRAST_ACCENT,
+                    "{primary} 구간 {step}에서 대비 {ratio:.2}:1 (목표 {CONTRAST_ACCENT})");
+            }
+        }
+    }
+
+    #[test]
+    fn 순수_검정_브랜드는_터미널_배경과_구분되게_들어올려진다() {
+        let (background, lifted) = segment_background(&brand("#000000", "#000000"));
+        assert!(lifted, "순수 검정인데 들어올리지 않았다");
+        assert!(relative_luminance(background) > TERMINAL_BACKGROUND_LUMINANCE,
+                "들어올렸는데도 터미널 배경보다 어둡다");
+
+        let (_, lifted) = segment_background(&brand("#FEE500", "#333333"));
+        assert!(!lifted, "밝은 브랜드색을 불필요하게 건드렸다");
+    }
+
+    #[test]
+    fn 대비를_위해_배경을_옮겨도_색상은_보존된다() {
+        // 토스·SOCAR 같은 중간 톤은 배경을 미세 조정해야 대비가 나온다.
+        // 명도만 움직이고 색상(hue)은 유지해야 브랜드 정체성이 남는다.
+        let subject = brand("#0078FF", "#354153");
+        let original = hex_to_rgb(&subject.primary);
+        let adjusted = gradient(&subject).start;
+        let hue_difference = (rgb_to_hls(original).0 - rgb_to_hls(adjusted).0).abs();
+        assert!(hue_difference < 0.01, "색상이 바뀌었다: {hue_difference}");
+    }
 }

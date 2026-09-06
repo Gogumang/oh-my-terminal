@@ -14,16 +14,21 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 
-fn project_root() -> PathBuf {
-    // 저장소 어디서 실행하든 루트를 찾는다 (brands/ 가 있는 곳).
-    let mut current = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+/// 저장소 어디서 실행하든 루트를 찾는다 (brands/ 와 catalog/ 가 있는 곳).
+/// 못 찾으면 조용히 cwd로 떨어지지 않는다 — 저장소 밖에서 실행했을 때
+/// 깊은 곳의 "No such file or directory" 대신 원인을 바로 말해야 한다.
+fn project_root() -> Result<PathBuf> {
+    let start = std::env::current_dir()?;
+    let mut current = start.clone();
     loop {
         if current.join("brands").is_dir() && current.join("catalog").is_dir() {
-            return current;
+            return Ok(current);
         }
         match current.parent() {
             Some(parent) => current = parent.to_path_buf(),
-            None => return std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
+            None => return Err(anyhow!(
+                "저장소 루트를 못 찾았다 ({}부터 위로 훑음). brands/ 와 catalog/ 가 있는 \
+                 디렉터리 안에서 실행할 것", start.display())),
         }
     }
 }
@@ -39,7 +44,7 @@ fn base_font() -> Result<PathBuf> {
 
 fn main() -> Result<()> {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
-    let root = project_root();
+    let root = project_root()?;
 
     match arguments.first().map(String::as_str) {
         Some("catalog") => {

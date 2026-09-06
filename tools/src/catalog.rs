@@ -164,19 +164,13 @@ pub fn enable(keys: &[String], root: &Path) -> Result<()> {
         };
         let prepared = repository.prepare(&brand);
 
-        let mut document = format!(
+        // 회사명·URL은 외부 데이터셋에서 온다. format!으로 YAML을 조립하면 따옴표나
+        // 콜론이 든 값 하나에 파일이 깨진다 — 직렬화기에 맡겨 그 부류를 없앤다.
+        let header = format!(
             "# catalog/brands.json에서 생성. 출처 검증일: {}\n\
-             # 직접 고치지 말고 `build-themes enable {}` 을 다시 실행할 것.\n\
-             key: {}\nname: {}\nprimary: \"{}\"\nsecondary: \"{}\"\n",
-            entry.verified.as_deref().unwrap_or("?"), entry.key,
-            entry.key, entry.name, entry.primary, entry.secondary);
-        if let Some(verified) = &entry.verified {
-            document.push_str(&format!("verified: \"{verified}\"\n"));
-        }
-        if let Some(logo) = &entry.logo {
-            document.push_str(&format!("logo:\n  kind: {}\n  url: \"{}\"\n", logo.kind, logo.url));
-        }
-        document.push_str(&format!("paths:\n  - \"~/Desktop/{}(|/*)\"\n", entry.key));
+             # 직접 고치지 말고 `build-themes enable {}` 을 다시 실행할 것.\n",
+            entry.verified.as_deref().unwrap_or("?"), entry.key);
+        let document = header + &serde_yaml::to_string(&brand)?;
         std::fs::write(root.join(format!("brands/{}.yaml", entry.key)), document)?;
         println!("  {} {} ({})", if prepared.is_some() { "로고" } else { "  · " },
                  entry.name, entry.primary);

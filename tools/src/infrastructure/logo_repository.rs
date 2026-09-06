@@ -38,8 +38,8 @@ impl LogoRepository {
         if colour_logo.exists() {
             if let Ok(image) = image::open(&colour_logo) {
                 let cleaned = shaper::clear_corner_background(&image.to_rgba8());
-                let _ = shaper::fit(&shaper::crop_to_content(&cleaned), LOGO_SIZE).save(&target);
-                return Some(target);
+                return self.save(shaper::fit(&shaper::crop_to_content(&cleaned), LOGO_SIZE),
+                                 &target, &brand.name);
             }
         }
 
@@ -47,8 +47,8 @@ impl LogoRepository {
         if custom_logo.exists() {
             if let Ok(image) = image::open(&custom_logo) {
                 let shape = shaper::to_silhouette(&image.to_rgba8());
-                let _ = shaper::fit(&shaper::crop_to_content(&shape), LOGO_SIZE).save(&target);
-                return Some(target);
+                return self.save(shaper::fit(&shaper::crop_to_content(&shape), LOGO_SIZE),
+                                 &target, &brand.name);
             }
         }
 
@@ -65,8 +65,8 @@ impl LogoRepository {
         if source.keep_colour {
             // 색 면에서 글자를 파낸 앱 아이콘은 실루엣으로 만들면 통짜 도형이 된다.
             let cleaned = shaper::clear_corner_background(&image);
-            let _ = shaper::fit(&shaper::crop_to_content(&cleaned), LOGO_SIZE).save(&target);
-            return Some(target);
+            return self.save(shaper::fit(&shaper::crop_to_content(&cleaned), LOGO_SIZE),
+                             &target, &brand.name);
         }
 
         let mut shape = shaper::crop_to_content(&shaper::to_silhouette(&image));
@@ -84,8 +84,20 @@ impl LogoRepository {
                 return None;
             }
         }
-        let _ = shaper::fit(&shaper::crop_to_content(&shape), LOGO_SIZE).save(&target);
-        Some(target)
+        self.save(shaper::fit(&shaper::crop_to_content(&shape), LOGO_SIZE), &target, &brand.name)
+    }
+
+    /// 저장 실패를 삼키면 존재하지 않는 경로가 logo_path에 남아, 나중에 폰트 생성이
+    /// 빌드 전체를 실패시킨다. 로고는 보조 데이터이므로 여기서 노트로 남기고 없던 일로 한다.
+    fn save(&mut self, image: RgbaImage, target: &Path, brand_name: &str) -> Option<PathBuf> {
+        match image.save(target) {
+            Ok(()) => Some(target.to_path_buf()),
+            Err(error) => {
+                self.notes.push(format!("{brand_name}: 로고 저장 실패 ({error})"));
+                let _ = std::fs::remove_file(target);
+                None
+            }
+        }
     }
 
     fn download(&self, url: &str) -> Result<RgbaImage> {
@@ -102,7 +114,7 @@ impl LogoRepository {
             let rendered = rasterize_svg(&data, LOGO_SIZE)?;
             // resvg 알파는 정확하니 그대로 믿는다. 다만 <rect>로 배경을 꽉 칠한 SVG
             // (무신사 favicon.svg)는 투명 영역이 거의 없다 — 그때만 배경을 걷어낸다.
-            return Ok(if shaper::alpha_coverage(&rendered) > 0.95 {
+            return Ok(if shaper::needs_background_strip(&rendered) {
                 shaper::strip_uniform_background(&rendered)
             } else {
                 rendered

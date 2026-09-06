@@ -81,6 +81,14 @@ pub fn write_font(base: &Path, brands: &[Brand], output_root: &Path) -> Result<O
     // ── hmtx: numberOfHMetrics 이후 글리프는 leftSideBearing만 갖는다.
     // 새 글리프는 마지막 longHorMetric의 advance를 물려받으므로(고정폭 폰트라 동일)
     // lsb 0을 개수만큼 덧붙이면 된다.
+    // lsb만 붙이는 확장은 이미 lsb-only 구간이 있을 때만 유효하다. 기반 폰트를
+    // 사용자가 바꿔치기할 수 있으므로(비고정폭 폰트) 가정을 검증한다.
+    let metrics_count = font.hhea()?.number_of_h_metrics() as u32;
+    if metrics_count >= original_glyphs {
+        return Err(anyhow!(
+            "기반 폰트에 lsb-only 구간이 없다 (numberOfHMetrics={metrics_count}, \
+             numGlyphs={original_glyphs}). 고정폭 폰트를 써야 새 글리프의 폭이 보장된다"));
+    }
     let mut hmtx = font.table_data(Tag::new(b"hmtx"))
         .ok_or_else(|| anyhow!("hmtx 테이블이 없다"))?.as_bytes().to_vec();
     for _ in 0..added { hmtx.extend_from_slice(&0i16.to_be_bytes()); }
