@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-11
+# 직접 고치지 말고 tools/enable_brand.py 를 다시 실행할 것.
+key: naver
+name: Naver
+primary: "#03C75A"
+secondary: "#16181D"
+verified: "2026-07-11"
+logo:
+  kind: simpleicons
+  url: "https://cdn.simpleicons.org/naver/000000"
+paths:
+  - "~/Desktop/naver(|/*)"

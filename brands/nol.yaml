@@ -1,0 +1,12 @@
+# 데이터셋에 없어 직접 추가 (NOL은 야놀자의 리브랜딩). 색은 로고에서 추출.
+# 직접 고치지 말고 tools/enable_brand.py 를 다시 실행할 것.
+key: nol
+name: NOL
+primary: "#3549FF"
+secondary: "#F5F6F9"
+logo:
+  kind: favicon
+  url: "https://www.google.com/s2/favicons?domain=yanolja.com&sz=128"
+  keep_colour: true   # 색 면에서 글자를 파낸 앱 아이콘 — 실루엣 불가
+paths:
+  - "~/Desktop/nol(|/*)"

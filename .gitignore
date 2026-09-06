@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# 빌드 중간 산출물 (미리보기 이미지 등)
+build/
+
+# 원격에서 받아온 로고는 재현 가능하므로 커밋하지 않는다.
+# 사용자가 직접 넣은 로고(.custom/.color)와 최종 결과는 커밋한다.
+logos/*.png
+!logos/*.custom.png
+!logos/*.color.png

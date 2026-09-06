@@ -1,0 +1,5 @@
+# 빌드 전용. 사용자는 설치할 필요가 없다 (생성물이 커밋돼 있음).
+Pillow>=10.0
+fontTools>=4.50
+PyYAML>=6.0
+resvg-py>=0.5      # SVG 래스터화. qlmanage와 달리 알파를 보존한다.

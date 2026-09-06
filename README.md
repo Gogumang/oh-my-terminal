@@ -1,0 +1,90 @@
+# oh-my-terminal
+
+회사 브랜드 색과 로고를 터미널에 입힙니다. 디렉터리에 따라 프롬프트가 자동으로 바뀝니다.
+
+```
+ ~/De/kakao ❯     ← 카카오 폴더: 카카오 옐로 그라데이션 + 카카오톡 로고
+ ~/De/naver ❯     ← 네이버 폴더: 네이버 그린 + N 로고
+ ~/De/study ❯     ← 회사 폴더 밖: 원래 프롬프트 그대로
+```
+
+## 설치
+
+파이썬이 필요 없습니다. 생성물이 저장소에 커밋돼 있습니다.
+
+```sh
+git clone https://github.com/Gogumang/oh-my-terminal.git
+cd oh-my-terminal
+./install.sh
+exec zsh
+```
+
+전제 조건: **zsh + [powerlevel10k](https://github.com/romkatv/powerlevel10k) + iTerm2**.
+
+## 무엇이 바뀌나
+
+세 계층이 각각 다른 것을 담당합니다. 셸 프롬프트만으로는 절반밖에 못 합니다.
+
+| 계층 | 담당 | 파일 |
+|---|---|---|
+| iTerm2 프로필 | ANSI 16색, 배경 로고, 탭 색, 뱃지, 라이트/다크 | `iterm2/brand-themes.json` |
+| zsh 프롬프트 | 경로 세그먼트의 브랜드 그라데이션 | `brands.zsh` |
+| 폰트 | 로고 글리프 (PUA 코드포인트) | `fonts/*.ttf` |
+
+`brands.zsh`는 **순수 zsh**입니다 — 외부 명령을 하나도 호출하지 않습니다.
+
+## 회사 추가
+
+`catalog/brands.json`에 **440개 회사**의 브랜드 색과 로고 출처가 들어 있습니다
+([oh-my-design](https://github.com/kwakseongjae/oh-my-design), MIT). 원하는 회사만 켜면 됩니다.
+
+```sh
+pip install -r tools/requirements.txt
+tools/enable_brand.py coupang line socar
+tools/build.py
+```
+
+`brands/<회사>.yaml`의 `paths`를 고치면 어느 디렉터리에서 그 테마를 쓸지 바꿀 수 있습니다.
+
+## 로고를 직접 넣기
+
+| 파일 | 처리 |
+|---|---|
+| `logos/<회사>.custom.png` | 형태만 쓰고 브랜드 색으로 자동 착색 |
+| `logos/<회사>.color.png` | 원본 색 유지 (모서리 배경은 자동 제거) |
+
+둘 다 임포터가 덮어쓰지 않습니다. 색 면에서 글자를 파낸 앱 아이콘은 실루엣으로 만들면
+형태가 사라지므로 `.color.png`를 쓰세요.
+
+## 설계 노트
+
+- **ANSI 0~15은 브랜드 색으로 덮지 않습니다.** `red=에러`, `green=성공` 의미가 무너지면
+  로그를 읽을 수 없습니다. 브랜드 색은 배경·커서·탭·뱃지에만 들어갑니다.
+- **그라데이션 깊이는 회사마다 다릅니다.** 깊을수록 보기 좋지만 중간 톤에서 글자가 묻히므로,
+  전 구간 WCAG 대비를 만족하는 가장 깊은 값을 자동으로 고릅니다 (당근 12%, 카카오 28%).
+- **브랜드 색이 순수 검정이면 들어올립니다.** 쿠팡·무신사는 `#000000`이라 터미널 배경과
+  구분되지 않아 세그먼트가 통째로 사라집니다.
+- **SVG는 resvg로 래스터화합니다.** macOS `qlmanage`는 썸네일 생성기라 알파를 버리고
+  흰 배경 위에 평탄화합니다. 그 탓에 배경을 되짚어 추정해야 했고, 획이 네 모서리에 닿는
+  로고(네이버 N)에서 추정이 뒤집혀 로고가 반전됐습니다.
+
+## 구조
+
+```
+brands.zsh, fonts/, iterm2/   생성물 — 커밋됨. 사용자는 이것만 있으면 됩니다
+brands/*.yaml                 켜둔 회사 정의
+catalog/brands.json           440개 회사 카탈로그 (언어 중립)
+logos/                        로고 원본
+tools/                        빌드 (메인테이너 전용)
+  ohmyterminal/domain/          모델·팔레트 계산·포트 (외부 의존 없음)
+  ohmyterminal/application/     유스케이스 조립
+  ohmyterminal/infrastructure/  로고 수집·래스터화·폰트/설정 생성
+```
+
+도메인은 어떤 레이어에도 의존하지 않고, 어댑터가 포트를 구현합니다.
+
+## 라이선스
+
+MIT. 브랜드 색 데이터는 [oh-my-design](https://github.com/kwakseongjae/oh-my-design)(MIT)에서
+가져왔습니다. **로고는 각 회사의 상표이며 이 저장소는 로고 파일을 커밋하지 않습니다** —
+빌드 시 각 회사의 공개 출처(Simple Icons·파비콘)에서 내려받습니다.

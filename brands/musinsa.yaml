@@ -1,0 +1,12 @@
+# catalog/brands.json에서 생성. 출처 검증일: 2026-07-13
+# 직접 고치지 말고 tools/enable_brand.py 를 다시 실행할 것.
+key: musinsa
+name: Musinsa
+primary: "#000000"
+secondary: "#000000"
+verified: "2026-07-13"
+logo:
+  kind: favicon
+  url: "https://image.msscdn.net/static/assets/bi/favicon/favicon.svg"
+paths:
+  - "~/Desktop/musinsa(|/*)"
