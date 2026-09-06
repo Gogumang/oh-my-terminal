@@ -39,10 +39,12 @@ exec zsh
 ([oh-my-design](https://github.com/kwakseongjae/oh-my-design), MIT). 원하는 회사만 켜면 됩니다.
 
 ```sh
-pip install -r tools/requirements.txt
-tools/enable_brand.py coupang line socar
-tools/build.py
+cd tools && cargo build --release && cd ..
+tools/target/release/build-themes enable coupang line socar
+tools/target/release/build-themes
 ```
+
+빌더는 Rust입니다. `cargo build --release` 하나면 되고 다른 의존성이 없습니다.
 
 `brands/<회사>.yaml`의 `paths`를 고치면 어느 디렉터리에서 그 테마를 쓸지 바꿀 수 있습니다.
 
@@ -73,6 +75,10 @@ tools/build.py
 - **SVG는 resvg로 래스터화합니다.** macOS `qlmanage`는 썸네일 생성기라 알파를 버리고
   흰 배경 위에 평탄화합니다. 그 탓에 배경을 되짚어 추정해야 했고, 획이 네 모서리에 닿는
   로고(네이버 N)에서 추정이 뒤집혀 로고가 반전됐습니다.
+- **sbix 테이블은 직접 직렬화합니다.** `write-fonts`의 sbix 타입은 원시 오프셋 배열을
+  노출해 어차피 손으로 채워야 하는데, 포맷이 단순해 바이트를 직접 만드는 쪽이 명료합니다.
+  기존 폰트에 글리프를 추가하려면 `cmap`·`loca`·`maxp`·`hmtx`·`post`도 함께 손봐야 합니다
+  (`post`는 v2의 글리프 이름 배열을 늘리는 대신 이름 없는 v3.0으로 바꿉니다).
 
 ## 구조
 
@@ -81,10 +87,10 @@ brands.zsh, fonts/, iterm2/   생성물 — 커밋됨. 사용자는 이것만 �
 brands/*.yaml                 켜둔 회사 정의
 catalog/brands.json           440개 회사 카탈로그 (언어 중립)
 logos/                        로고 원본
-tools/                        빌드 (메인테이너 전용)
-  ohmyterminal/domain/          모델·팔레트 계산·포트 (외부 의존 없음)
-  ohmyterminal/application/     유스케이스 조립
-  ohmyterminal/infrastructure/  로고 수집·래스터화·폰트/설정 생성
+tools/                        빌드 (메인테이너 전용, Rust)
+  src/domain/                   모델·팔레트 계산 (외부 의존 없음)
+  src/application/              유스케이스 조립
+  src/infrastructure/           로고 수집·래스터화·폰트/설정 생성
 ```
 
 도메인은 어떤 레이어에도 의존하지 않고, 어댑터가 포트를 구현합니다.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# oh-my-terminal 설치 — 파이썬 없이 동작한다. 생성물은 저장소에 커밋돼 있다.
+# oh-my-terminal 설치 — 빌드 도구 없이 동작한다. 생성물은 저장소에 커밋돼 있다.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

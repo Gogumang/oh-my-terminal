@@ -10,3 +10,6 @@ build/
 logos/*.png
 !logos/*.custom.png
 !logos/*.color.png
+
+# Rust 빌드 산출물
+tools/target/

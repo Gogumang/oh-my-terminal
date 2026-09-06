@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-#  이 파일은 tools/build.py가 생성한다. 직접 고치지 말고 brands/*.yaml을 고칠 것.
+#  이 파일은 oh-my-terminal 빌더가 생성한다. 직접 고치지 말고 brands/*.yaml을 고칠 것.
 #  순수 zsh다 — python·curl 등 외부 명령에 의존하지 않는다.
 #  ~/.p10k.zsh 를 source 한 '뒤에' 이 파일을 source 해야 한다.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -59,18 +59,18 @@ _brand_logo_segment() {
 }
 
 typeset -g POWERLEVEL9K_DIR_CLASSES=(
-  '~/Desktop/baemin(|/*)'        BRAND_BAEMIN       ''
-  '~/Desktop/banksalad(|/*)'     BRAND_BANKSALAD    ''
-  '~/Desktop/coupang(|/*)'       BRAND_COUPANG      ''
-  '~/Desktop/kakao(|/*)'         BRAND_KAKAO        ''
-  '~/Desktop/karrot(|/*)'        BRAND_KARROT       ''
-  '~/Desktop/line(|/*)'          BRAND_LINE         ''
-  '~/Desktop/musinsa(|/*)'       BRAND_MUSINSA      ''
-  '~/Desktop/naver(|/*)'         BRAND_NAVER        ''
-  '~/Desktop/nol(|/*)'           BRAND_NOL          ''
-  '~/Desktop/socar(|/*)'         BRAND_SOCAR        ''
-  '~/Desktop/toss(|/*)'          BRAND_TOSS         ''
-  '*'                            DEFAULT            ''
+  '~/Desktop/baemin(|/*)'          BRAND_BAEMIN       ''
+  '~/Desktop/banksalad(|/*)'       BRAND_BANKSALAD    ''
+  '~/Desktop/coupang(|/*)'         BRAND_COUPANG      ''
+  '~/Desktop/kakao(|/*)'           BRAND_KAKAO        ''
+  '~/Desktop/karrot(|/*)'          BRAND_KARROT       ''
+  '~/Desktop/line(|/*)'            BRAND_LINE         ''
+  '~/Desktop/musinsa(|/*)'         BRAND_MUSINSA      ''
+  '~/Desktop/naver(|/*)'           BRAND_NAVER        ''
+  '~/Desktop/nol(|/*)'             BRAND_NOL          ''
+  '~/Desktop/socar(|/*)'           BRAND_SOCAR        ''
+  '~/Desktop/toss(|/*)'            BRAND_TOSS         ''
+  '*'                              DEFAULT            ''
 )
 
 # DEFAULT 클래스는 값을 정의하지 않는다 — p10k가 기존 POWERLEVEL9K_DIR_* 로 폴백하므로

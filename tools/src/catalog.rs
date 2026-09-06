@@ -1,0 +1,187 @@
+//! oh-my-design(MIT) 데이터셋을 다루는 도구.
+//!
+//! 440개 회사의 브랜드 색·로고 출처를 언어 중립 JSON 하나로 모은다. 색을 손으로 적지
+//! 않는 것이 요점이다 — 이 데이터셋은 각 색의 출처와 수집일을 기록해 두어 손으로 넣은
+//! 값보다 정확하고 갱신도 추적된다.
+
+use std::collections::BTreeMap;
+use std::path::Path;
+
+use anyhow::{anyhow, Result};
+use serde::{Deserialize, Serialize};
+
+use crate::domain::brand::{Brand, LogoSource};
+use crate::infrastructure::logo_repository::LogoRepository;
+
+const CATALOG_VERSION: u32 = 1;
+
+#[derive(Serialize, Deserialize)]
+pub struct Entry {
+    pub key: String,
+    pub name: String,
+    pub country: Option<String>,
+    pub category: Option<String>,
+    pub primary: String,
+    pub secondary: String,
+    pub colors: BTreeMap<String, String>,
+    pub logo: Option<LogoEntry>,
+    pub verified: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct LogoEntry {
+    pub kind: String,
+    pub reference: String,
+    pub url: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Catalog {
+    pub version: u32,
+    pub source: BTreeMap<String, String>,
+    pub brands: Vec<Entry>,
+}
+
+fn frontmatter(text: &str) -> &str {
+    text.strip_prefix("---\n")
+        .and_then(|rest| rest.split_once("\n---").map(|(head, _)| head))
+        .unwrap_or("")
+}
+
+fn scalar(block: &str, key: &str) -> Option<String> {
+    block.lines().find_map(|line| {
+        let rest = line.strip_prefix(key)?.strip_prefix(':')?;
+        Some(rest.trim().trim_matches('"').to_string())
+    }).filter(|value| !value.is_empty())
+}
+
+fn logo_entry(block: &str) -> Option<LogoEntry> {
+    let start = block.lines().position(|line| line.starts_with("logo:"))?;
+    let body: Vec<&str> = block.lines().skip(start + 1)
+        .take_while(|line| line.starts_with("  ")).collect();
+    let field = |key: &str| body.iter().find_map(|line| {
+        let rest = line.trim().strip_prefix(key)?.strip_prefix(':')?;
+        Some(rest.trim().trim_matches('"').to_string())
+    });
+    let kind = field("type")?;
+    let reference = field("slug")?;
+    let url = match kind.as_str() {
+        "simpleicons" => format!("https://cdn.simpleicons.org/{reference}/000000"),
+        "github" => format!("https://github.com/{reference}.png?size=512"),
+        _ => reference.clone(),
+    };
+    Some(LogoEntry { kind, reference, url })
+}
+
+fn semantic_colours(text: &str) -> BTreeMap<String, String> {
+    let mut found = BTreeMap::new();
+    let Some(start) = text.lines().position(|line| line.trim_end() == "  colors:") else {
+        return found;
+    };
+    for line in text.lines().skip(start + 1) {
+        if !line.starts_with("    ") { break; }
+        if let Some((key, value)) = line.trim().split_once(':') {
+            let value = value.trim().trim_matches('"');
+            if value.starts_with('#') {
+                found.insert(key.to_string(), value.to_uppercase());
+            }
+        }
+    }
+    found
+}
+
+pub fn build(dataset: &Path, root: &Path) -> Result<()> {
+    if !dataset.exists() {
+        return Err(anyhow!("데이터셋을 찾을 수 없다: {}", dataset.display()));
+    }
+    let mut directories: Vec<_> = std::fs::read_dir(dataset)?
+        .filter_map(|entry| entry.ok().map(|e| e.path()))
+        .filter(|path| path.is_dir()).collect();
+    directories.sort();
+
+    let mut entries = Vec::new();
+    let mut skipped = 0;
+    for directory in directories {
+        let design = directory.join("DESIGN.md");
+        if !design.exists() { continue; }
+        let text = std::fs::read_to_string(&design)?;
+        let block = frontmatter(&text);
+        let Some(primary) = scalar(block, "primary_color") else {  // 핵심 데이터
+            skipped += 1;
+            continue;
+        };
+        let key = directory.file_name().unwrap().to_string_lossy().to_string();
+        let colours = semantic_colours(&text);
+        entries.push(Entry {
+            name: scalar(block, "name").unwrap_or_else(|| key.clone()),
+            country: scalar(block, "country"),
+            category: scalar(block, "category"),
+            primary: primary.to_uppercase(),
+            // secondary는 프롬프트 글자색의 씨앗이다. 본문색이 가장 안정적이다.
+            secondary: colours.get("foreground").or_else(|| colours.get("dark-marketing"))
+                .cloned().unwrap_or_else(|| "#16181D".to_string()),
+            colors: colours,
+            logo: logo_entry(block),
+            verified: scalar(block, "verified"),
+            key,
+        });
+    }
+
+    let catalog = Catalog {
+        version: CATALOG_VERSION,
+        source: BTreeMap::from([
+            ("name".into(), "oh-my-design".into()),
+            ("url".into(), "https://github.com/kwakseongjae/oh-my-design".into()),
+            ("license".into(), "MIT".into())]),
+        brands: entries,
+    };
+    let output = root.join("catalog/brands.json");
+    std::fs::write(&output, serde_json::to_string_pretty(&catalog)? + "\n")?;
+    println!("카탈로그 생성: {}", output.display());
+    println!("  회사 {}개  (primary_color 없어 제외 {}개)", catalog.brands.len(), skipped);
+    Ok(())
+}
+
+pub fn enable(keys: &[String], root: &Path) -> Result<()> {
+    let catalog: Catalog = serde_json::from_str(
+        &std::fs::read_to_string(root.join("catalog/brands.json"))?)?;
+    let index: BTreeMap<&str, &Entry> =
+        catalog.brands.iter().map(|e| (e.key.as_str(), e)).collect();
+    let mut repository = LogoRepository::new(root.join("logos"));
+
+    for key in keys {
+        let Some(entry) = index.get(key.as_str()) else {
+            eprintln!("  ! 카탈로그에 없다: {key}");
+            continue;
+        };
+        let brand = Brand {
+            key: entry.key.clone(), name: entry.name.clone(),
+            primary: entry.primary.clone(), secondary: entry.secondary.clone(),
+            paths: vec![format!("~/Desktop/{}(|/*)", entry.key)],
+            logo: entry.logo.as_ref().map(|logo| LogoSource {
+                kind: logo.kind.clone(), url: logo.url.clone(), keep_colour: false }),
+            verified: entry.verified.clone(), logo_path: None,
+        };
+        let prepared = repository.prepare(&brand);
+
+        let mut document = format!(
+            "# catalog/brands.json에서 생성. 출처 검증일: {}\n\
+             # 직접 고치지 말고 `build-themes enable {}` 을 다시 실행할 것.\n\
+             key: {}\nname: {}\nprimary: \"{}\"\nsecondary: \"{}\"\n",
+            entry.verified.as_deref().unwrap_or("?"), entry.key,
+            entry.key, entry.name, entry.primary, entry.secondary);
+        if let Some(verified) = &entry.verified {
+            document.push_str(&format!("verified: \"{verified}\"\n"));
+        }
+        if let Some(logo) = &entry.logo {
+            document.push_str(&format!("logo:\n  kind: {}\n  url: \"{}\"\n", logo.kind, logo.url));
+        }
+        document.push_str(&format!("paths:\n  - \"~/Desktop/{}(|/*)\"\n", entry.key));
+        std::fs::write(root.join(format!("brands/{}.yaml", entry.key)), document)?;
+        println!("  {} {} ({})", if prepared.is_some() { "로고" } else { "  · " },
+                 entry.name, entry.primary);
+    }
+    for note in &repository.notes { eprintln!("  ! {note}"); }
+    println!("\n다음: build-themes");
+    Ok(())
+}

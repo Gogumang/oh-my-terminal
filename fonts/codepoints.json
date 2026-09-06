@@ -1,6 +1,4 @@
 {
-  "family": "OhMyTerminal Brand",
-  "postscript": "OhMyTerminalBrand-Regular",
   "codepoints": {
     "baemin": 59648,
     "banksalad": 59649,
@@ -13,5 +11,7 @@
     "nol": 59656,
     "socar": 59657,
     "toss": 59658
-  }
+  },
+  "family": "OhMyTerminal Brand",
+  "postscript": "OhMyTerminalBrand-Regular"
 }
