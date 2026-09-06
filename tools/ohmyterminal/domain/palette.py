@@ -22,6 +22,14 @@ ANSI_LIGHT = ["#2E3440", "#C33F49", "#4B801F", "#9A6200", "#1B6FC4", "#8B3FB0", 
 # 그라데이션 깊이 후보. 깊을수록 예쁘지만 중간 톤에서 글자가 묻힌다 — 통과하는 첫 값을 쓴다.
 GRADIENT_DEPTHS = (0.55, 0.45, 0.35, 0.28, 0.22, 0.17, 0.12, 0.08)
 
+# 셸(brands.zsh)이 글자색을 전환하는 기준. 여기 값과 zsh 쪽이 반드시 같아야 한다 —
+# 다르면 "검증은 통과했는데 실제로는 안 읽히는" 상태가 된다.
+LUMA_SWITCH = 140
+
+# 브랜드 색이 중간 톤이면 검정으로도 흰색으로도 4.5:1이 안 나온다(토스 #0064FF 등).
+# 그럴 때 배경 명도를 이 폭까지 옮겨 대비를 확보한다. 색상(hue)과 채도는 보존한다.
+BACKGROUND_NUDGE_STEPS = (0.0, 0.04, -0.04, 0.08, -0.08, 0.12, -0.12, 0.16, -0.16, 0.20, -0.20)
+
 
 def hex_to_rgb(value):
     value = value.lstrip("#")
@@ -80,24 +88,64 @@ def segment_background(brand):
     return background, False
 
 
+def _luma_255(rgb):
+    """셸이 쓰는 것과 같은 정수 밝기 계산 (ITU-R BT.601 근사)."""
+    red, green, blue = (round(channel * 255) for channel in rgb)
+    return (red * 299 + green * 587 + blue * 114) // 1000
+
+
+def _evaluate(background, seed, depth):
+    """주어진 배경·깊이에서 (끝색, 어두운글자, 밝은글자, 실제최저대비)를 계산한다.
+
+    셸은 각 글자 위치에서 배경 밝기를 보고 '한쪽'만 쓴다. 그러므로 어두운 글자색은
+    자기가 실제로 쓰이는 구간 중 '가장 어두운 배경'에서 읽혀야 하고, 밝은 글자색은
+    자기 구간 중 '가장 밝은 배경'에서 읽혀야 한다. 예전처럼 두 색의 max를 재면
+    실제로 쓰이지 않는 색 덕분에 통과해버려, 검증은 녹색인데 화면은 안 읽혔다.
+    """
+    end = blend(background, (0.0, 0.0, 0.0), depth)
+    stops = [blend(background, end, step / 8) for step in range(9)]
+    bright = [stop for stop in stops if _luma_255(stop) > LUMA_SWITCH]
+    dim = [stop for stop in stops if _luma_255(stop) <= LUMA_SWITCH]
+
+    dark = push_to_contrast(seed, min(bright, key=_luma_255), CONTRAST_ACCENT, "darker")[0] \
+        if bright else seed
+    light = push_to_contrast(seed, max(dim, key=_luma_255), CONTRAST_ACCENT, "lighter")[0] \
+        if dim else seed
+
+    lowest = min(contrast_ratio(dark if _luma_255(stop) > LUMA_SWITCH else light, stop)
+                 for stop in stops)
+    return end, dark, light, lowest
+
+
 def gradient(brand):
     """(시작색, 끝색, 어두운 글자색, 밝은 글자색, 최저대비, 깊이)를 계산한다.
 
-    배경이 그라데이션이므로 전 구간에서 읽혀야 한다. 글자색은 배경 밝기에 따라
-    두 색 중 하나로 전환되므로, 각 구간의 '더 나은 쪽' 대비의 최솟값이 실제 최저 대비다.
+    깊이를 줄여도 대비가 안 나오면 배경 명도를 조금씩 옮긴다 — 중간 톤 브랜드색은
+    검정으로도 흰색으로도 4.5:1이 안 나오기 때문이다. 색상은 보존하므로 브랜드 정체성은
+    유지되고, 얼마나 옮겼는지는 빌드 로그에 남는다.
     """
-    background, _ = segment_background(brand)
+    base, _ = segment_background(brand)
     seed = hex_to_rgb(brand.secondary)
+    hue_lightness = colorsys.rgb_to_hls(*base)[1]
+    fallback = None
 
-    for depth in GRADIENT_DEPTHS:
-        end = blend(background, (0.0, 0.0, 0.0), depth)
-        stops = [blend(background, end, step / 8) for step in range(9)]
-        dark, _ = push_to_contrast(seed, stops[0], CONTRAST_ACCENT, "darker")
-        light, _ = push_to_contrast(seed, stops[-1], CONTRAST_ACCENT, "lighter")
-        lowest = min(max(contrast_ratio(dark, stop), contrast_ratio(light, stop)) for stop in stops)
-        if lowest >= CONTRAST_ACCENT:
-            return background, end, dark, light, lowest, depth
-    return background, end, dark, light, lowest, GRADIENT_DEPTHS[-1]
+    for nudge in BACKGROUND_NUDGE_STEPS:
+        lightness = min(0.95, max(0.05, hue_lightness + nudge))
+        background = with_lightness(base, lightness)
+        for depth in GRADIENT_DEPTHS:
+            end, dark, light, lowest = _evaluate(background, seed, depth)
+            if lowest >= CONTRAST_ACCENT:
+                return background, end, dark, light, lowest, depth
+            if fallback is None or lowest > fallback[4]:
+                fallback = (background, end, dark, light, lowest, depth)
+    return fallback
+
+
+def background_nudge(brand):
+    """대비를 맞추느라 배경을 얼마나 옮겼는지 (보고용)."""
+    original = rgb_to_hex(segment_background(brand)[0])
+    adjusted = rgb_to_hex(gradient(brand)[0])
+    return original, adjusted, original != adjusted
 
 
 def logo_tint(brand):

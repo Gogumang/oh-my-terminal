@@ -32,6 +32,11 @@ class BuildThemes:
                 report["warnings"].append(
                     f"{brand.name}: 그라데이션 구간 최저 대비 {lowest:.1f}:1 "
                     f"(목표 {palette.CONTRAST_ACCENT}:1) — 브랜드 색이 중간 톤이라 한계")
+            original, adjusted, moved = palette.background_nudge(brand)
+            if moved:
+                report["warnings"].append(
+                    f"{brand.name}: 대비 확보를 위해 세그먼트 배경을 {original} → {adjusted} 로 "
+                    f"미세 조정 (색상은 보존)")
             if lifted:
                 report["warnings"].append(
                     f"{brand.name}: 브랜드색이 터미널 배경과 구분되지 않아 들어올림")
