@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable doordash` 을 다시 실행할 것.
 key: doordash
 name: DoorDash
+country: US
 primary: '#EB1700'
 secondary: '#16181D'
 verified: 2026-06-22

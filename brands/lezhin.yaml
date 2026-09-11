@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable lezhin` 을 다시 실행할 것.
 key: lezhin
 name: Lezhin Comics
+country: KR
 primary: '#EB0014'
 secondary: '#16181D'
 verified: 2026-06-03

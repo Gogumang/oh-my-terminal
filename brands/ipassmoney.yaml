@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable ipassmoney` 을 다시 실행할 것.
 key: ipassmoney
 name: iPASS MONEY
+country: TW
 primary: '#53B232'
 secondary: '#16181D'
 verified: 2026-06-22

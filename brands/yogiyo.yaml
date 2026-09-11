@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable yogiyo` 을 다시 실행할 것.
 key: yogiyo
 name: Yogiyo
+country: KR
 primary: '#FA0050'
 secondary: '#16181D'
 verified: 2026-05-27

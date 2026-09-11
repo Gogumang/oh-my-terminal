@@ -15,6 +15,10 @@ pub struct LogoSource {
 pub struct Brand {
     pub key: String,
     pub name: String,
+    /// 두 글자 나라 코드 (카탈로그 표기를 따라 영국은 `UK`). README 지원 테마를 나라별로
+    /// 묶는 데만 쓴다.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>,
     pub primary: String,
     pub secondary: String,
     /// 브랜드 색의 출처 검증일. 데이터셋이 갱신됐는지 사람이 판단하는 근거라

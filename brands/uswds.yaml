@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable uswds` 을 다시 실행할 것.
 key: uswds
 name: U.S. Web Design System
+country: US
 primary: '#005EA2'
 secondary: '#1B1B1B'
 verified: 2026-07-13

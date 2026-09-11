@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable recruit` 을 다시 실행할 것.
 key: recruit
 name: リクルート
+country: JP
 primary: '#0065BD'
 secondary: '#2D3133'
 verified: 2026-07-13

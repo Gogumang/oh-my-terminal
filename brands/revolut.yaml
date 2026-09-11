@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable revolut` 을 다시 실행할 것.
 key: revolut
 name: Revolut
+country: UK
 primary: '#0075EB'
 secondary: '#16181D'
 verified: 2026-05-15

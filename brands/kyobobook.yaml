@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kyobobook` 을 다시 실행할 것.
 key: kyobobook
 name: Kyobo Book Centre
+country: KR
 primary: '#5055B1'
 secondary: '#16181D'
 verified: 2026-06-26

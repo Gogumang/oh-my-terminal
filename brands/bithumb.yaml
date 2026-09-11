@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable bithumb` 을 다시 실행할 것.
 key: bithumb
 name: Bithumb
+country: KR
 primary: '#1C2028'
 secondary: '#FFFFFF'
 verified: 2026-06-01

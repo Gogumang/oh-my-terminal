@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable slack` 을 다시 실행할 것.
 key: slack
 name: Slack
+country: US
 primary: '#4A154B'
 secondary: '#1D1C1D'
 verified: 2026-06-06

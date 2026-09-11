@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable modusign` 을 다시 실행할 것.
 key: modusign
 name: Modusign
+country: KR
 primary: '#FED05F'
 secondary: '#16181D'
 verified: 2026-06-10

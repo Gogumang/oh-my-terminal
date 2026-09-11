@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable 42dot` 을 다시 실행할 것.
 key: 42dot
 name: 42dot
+country: KR
 primary: '#786EFA'
 secondary: '#16181D'
 verified: 2026-07-02

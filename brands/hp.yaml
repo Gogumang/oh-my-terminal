@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable hp` 을 다시 실행할 것.
 key: hp
 name: HP
+country: US
 primary: '#0096D6'
 secondary: '#16181D'
 verified: 2026-06-06

@@ -86,7 +86,7 @@ mod tests {
     use super::*;
 
     fn brand(key: &str, logo_path: Option<PathBuf>) -> Brand {
-        Brand { key: key.into(), name: key.into(), primary: "#0064FF".into(),
+        Brand { key: key.into(), name: key.into(), country: None, primary: "#0064FF".into(),
                 secondary: "#0064FF".into(), logo: None, verified: None, logo_path }
     }
 

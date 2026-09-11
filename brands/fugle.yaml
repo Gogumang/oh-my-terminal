@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable fugle` 을 다시 실행할 것.
 key: fugle
 name: Fugle
+country: TW
 primary: '#F4AF1C'
 secondary: '#16181D'
 verified: 2026-06-03

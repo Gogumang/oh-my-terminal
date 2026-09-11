@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable lablup` 을 다시 실행할 것.
 key: lablup
 name: Lablup
+country: KR
 primary: '#28AB6C'
 secondary: '#16181D'
 verified: 2026-06-26

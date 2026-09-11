@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable farfetch` 을 다시 실행할 것.
 key: farfetch
 name: Farfetch
+country: UK
 primary: '#222222'
 secondary: '#16181D'
 verified: 2026-06-22

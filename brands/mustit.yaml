@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable mustit` 을 다시 실행할 것.
 key: mustit
 name: MUSTIT
+country: KR
 primary: '#D00000'
 secondary: '#222222'
 verified: 2026-06-03

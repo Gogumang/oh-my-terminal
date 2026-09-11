@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable pepabo` 을 다시 실행할 것.
 key: pepabo
 name: GMO Pepabo (Inhouse)
+country: JP
 primary: '#1F7CCC'
 secondary: '#16181D'
 verified: 2026-06-17

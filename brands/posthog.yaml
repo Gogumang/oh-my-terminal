@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable posthog` 을 다시 실행할 것.
 key: posthog
 name: PostHog
+country: US
 primary: '#1D4AFF'
 secondary: '#4D4F46'
 verified: 2026-05-15

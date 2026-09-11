@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable nhn` 을 다시 실행할 것.
 key: nhn
 name: NHN
+country: KR
 primary: '#212126'
 secondary: '#36363D'
 verified: 2026-07-13

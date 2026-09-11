@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable freee` 을 다시 실행할 것.
 key: freee
 name: freee
+country: JP
 primary: '#2864F0'
 secondary: '#16181D'
 verified: 2026-07-13

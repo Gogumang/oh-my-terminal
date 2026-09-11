@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable mongodb` 을 다시 실행할 것.
 key: mongodb
 name: MongoDB
+country: US
 primary: '#00ED64'
 secondary: '#16181D'
 verified: 2026-07-13

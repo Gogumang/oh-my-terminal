@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kream` 을 다시 실행할 것.
 key: kream
 name: KREAM
+country: KR
 primary: '#000000'
 secondary: '#222222'
 verified: 2026-07-13

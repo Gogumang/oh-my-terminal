@@ -242,7 +242,7 @@ mod tests {
     use super::*;
 
     fn brand(primary: &str, secondary: &str) -> Brand {
-        Brand { key: "t".into(), name: "T".into(), primary: primary.into(),
+        Brand { key: "t".into(), name: "T".into(), country: None, primary: primary.into(),
                 secondary: secondary.into(), logo: None, verified: None, logo_path: None }
     }
 

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable shiftup` 을 다시 실행할 것.
 key: shiftup
 name: Shift Up
+country: KR
 primary: '#569A43'
 secondary: '#16181D'
 verified: 2026-06-17

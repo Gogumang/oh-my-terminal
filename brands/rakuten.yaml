@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable rakuten` 을 다시 실행할 것.
 key: rakuten
 name: Rakuten
+country: JP
 primary: '#BF0000'
 secondary: '#16181D'
 verified: 2026-06-10

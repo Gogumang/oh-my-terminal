@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable webflow` 을 다시 실행할 것.
 key: webflow
 name: Webflow
+country: US
 primary: '#146EF5'
 secondary: '#16181D'
 verified: 2026-05-15

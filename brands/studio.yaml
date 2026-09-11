@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable studio` 을 다시 실행할 것.
 key: studio
 name: Studio
+country: JP
 primary: '#007CFF'
 secondary: '#16181D'
 verified: 2026-06-06

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable humanscape` 을 다시 실행할 것.
 key: humanscape
 name: Humanscape
+country: KR
 primary: '#00ADF7'
 secondary: '#16181D'
 verified: 2026-07-02

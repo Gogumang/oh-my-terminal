@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable zapier` 을 다시 실행할 것.
 key: zapier
 name: Zapier
+country: US
 primary: '#FF4F00'
 secondary: '#16181D'
 verified: 2026-07-13

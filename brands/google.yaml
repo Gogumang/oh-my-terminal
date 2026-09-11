@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable google` 을 다시 실행할 것.
 key: google
 name: Google
+country: US
 primary: '#1A73E8'
 secondary: '#3C4043'
 verified: 2026-07-13

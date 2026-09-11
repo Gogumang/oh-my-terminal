@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable voltagent` 을 다시 실행할 것.
 key: voltagent
 name: VoltAgent
+country: US
 primary: '#22C55E'
 secondary: '#16181D'
 verified: 2026-05-15

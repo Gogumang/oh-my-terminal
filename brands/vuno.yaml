@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable vuno` 을 다시 실행할 것.
 key: vuno
 name: VUNO
+country: KR
 primary: '#40E2DE'
 secondary: '#16181D'
 verified: 2026-06-26

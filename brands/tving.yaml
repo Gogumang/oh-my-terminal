@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable tving` 을 다시 실행할 것.
 key: tving
 name: TVING
+country: KR
 primary: '#FF153C'
 secondary: '#FFFFFF'
 verified: 2026-07-13

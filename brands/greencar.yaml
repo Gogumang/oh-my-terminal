@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable greencar` 을 다시 실행할 것.
 key: greencar
 name: Greencar
+country: KR
 primary: '#00C88C'
 secondary: '#16181D'
 verified: 2026-06-26

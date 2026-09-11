@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable stripe` 을 다시 실행할 것.
 key: stripe
 name: Stripe
+country: US
 primary: '#635BFF'
 secondary: '#414552'
 verified: 2026-07-13

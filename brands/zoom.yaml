@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable zoom` 을 다시 실행할 것.
 key: zoom
 name: Zoom
+country: US
 primary: '#0B5CFF'
 secondary: '#16181D'
 verified: 2026-06-22

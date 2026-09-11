@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable naverwebtoon` 을 다시 실행할 것.
 key: naverwebtoon
 name: Naver Webtoon
+country: KR
 primary: '#00DC64'
 secondary: '#000000'
 verified: 2026-07-13

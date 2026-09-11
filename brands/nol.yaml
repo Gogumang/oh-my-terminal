@@ -1,7 +1,8 @@
 # 데이터셋에 없어 직접 추가 (NOL은 야놀자의 리브랜딩). 색은 로고에서 추출.
-# 직접 고치지 말고 tools/enable_brand.py 를 다시 실행할 것.
+# 카탈로그에 없어 `build-themes enable`로 다시 만들 수 없다 — 이 파일을 직접 고칠 것.
 key: nol
 name: NOL
+country: KR
 primary: "#3549FF"
 secondary: "#F5F6F9"
 logo:

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable spotify` 을 다시 실행할 것.
 key: spotify
 name: Spotify
+country: US
 primary: '#1ED760'
 secondary: '#FFFFFF'
 verified: 2026-07-13

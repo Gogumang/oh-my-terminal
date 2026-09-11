@@ -189,7 +189,7 @@ mod tests {
         std::fs::write(committed.join("t.png"), b"png").unwrap();
 
         let mut repository = LogoRepository::new(root.join("logos"), &committed);
-        let brand = Brand { key: "t".into(), name: "T".into(), primary: "#0064FF".into(),
+        let brand = Brand { key: "t".into(), name: "T".into(), country: None, primary: "#0064FF".into(),
                             secondary: "#0064FF".into(), logo: None, verified: None,
                             logo_path: None };
         let prepared = repository.prepare(&brand);

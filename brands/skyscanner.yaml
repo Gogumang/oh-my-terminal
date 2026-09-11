@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable skyscanner` 을 다시 실행할 것.
 key: skyscanner
 name: Skyscanner
+country: UK
 primary: '#0062E3'
 secondary: '#161616'
 verified: 2026-06-22

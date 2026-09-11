@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable pega` 을 다시 실행할 것.
 key: pega
 name: Pega UX Design System
+country: US
 primary: '#1A3A5C'
 secondary: '#050505'
 verified: 2026-07-13

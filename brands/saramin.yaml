@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable saramin` 을 다시 실행할 것.
 key: saramin
 name: Saramin
+country: KR
 primary: '#4876EF'
 secondary: '#16181D'
 verified: 2026-06-26

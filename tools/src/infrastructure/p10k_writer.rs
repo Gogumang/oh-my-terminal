@@ -74,7 +74,7 @@ mod tests {
     use super::*;
 
     fn brand(key: &str, name: &str) -> Brand {
-        Brand { key: key.into(), name: name.into(), primary: "#0064FF".into(),
+        Brand { key: key.into(), name: name.into(), country: None, primary: "#0064FF".into(),
                 secondary: "#0064FF".into(), logo: None, verified: None, logo_path: None }
     }
 
@@ -146,7 +146,7 @@ mod tests {
         // 또 iTerm2 GPU 렌더러는 로고를 그 칸의 글자색으로 칠해, 경로와 같은 회색 글자색을 쓰자
         // 어두운 띠 위 로고(삼성·우버)가 얼룩으로만 보였다.
         let home = scratch("logo-colour");
-        let kakao = Brand { key: "kakao".into(), name: "Kakao".into(), primary: "#FEE500".into(),
+        let kakao = Brand { key: "kakao".into(), name: "Kakao".into(), country: None, primary: "#FEE500".into(),
                             secondary: "#333333".into(), logo: None, verified: None, logo_path: None };
         let start = palette::rgb_to_hex(palette::gradient(&kakao).start);
         let glyphs = BTreeMap::from([("kakao".to_string(), "\u{100000}\u{100001}".to_string())]);

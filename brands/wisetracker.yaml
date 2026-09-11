@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable wisetracker` 을 다시 실행할 것.
 key: wisetracker
 name: Wisetracker
+country: KR
 primary: '#FF8D08'
 secondary: '#16181D'
 verified: 2026-07-02

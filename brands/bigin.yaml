@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable bigin` 을 다시 실행할 것.
 key: bigin
 name: Bigin
+country: KR
 primary: '#006FFF'
 secondary: '#16181D'
 verified: 2026-06-26

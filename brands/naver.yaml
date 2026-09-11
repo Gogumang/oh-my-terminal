@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable naver` 을 다시 실행할 것.
 key: naver
 name: Naver
+country: KR
 primary: '#03C75A'
 secondary: '#16181D'
 verified: 2026-07-11

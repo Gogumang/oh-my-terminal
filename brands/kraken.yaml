@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kraken` 을 다시 실행할 것.
 key: kraken
 name: Kraken
+country: US
 primary: '#5741D9'
 secondary: '#101114'
 verified: 2026-05-15

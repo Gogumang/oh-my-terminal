@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable vercel` 을 다시 실행할 것.
 key: vercel
 name: Vercel
+country: US
 primary: '#171717'
 secondary: '#171717'
 verified: 2026-07-12

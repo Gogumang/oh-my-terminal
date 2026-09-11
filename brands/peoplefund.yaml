@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable peoplefund` 을 다시 실행할 것.
 key: peoplefund
 name: PeopleFund
+country: KR
 primary: '#FFC32D'
 secondary: '#16181D'
 verified: 2026-07-02

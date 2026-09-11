@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable sktelecom` 을 다시 실행할 것.
 key: sktelecom
 name: SK텔레콤
+country: KR
 primary: '#3A46CD'
 secondary: '#1A2232'
 verified: 2026-07-13

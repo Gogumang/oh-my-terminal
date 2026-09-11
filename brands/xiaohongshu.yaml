@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable xiaohongshu` 을 다시 실행할 것.
 key: xiaohongshu
 name: Xiaohongshu
+country: CN
 primary: '#FF2442'
 secondary: '#16181D'
 verified: 2026-05-19

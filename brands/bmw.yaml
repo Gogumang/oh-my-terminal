@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable bmw` 을 다시 실행할 것.
 key: bmw
 name: BMW
+country: DE
 primary: '#1C69D4'
 secondary: '#414141'
 verified: 2026-07-13

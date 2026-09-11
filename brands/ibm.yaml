@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable ibm` 을 다시 실행할 것.
 key: ibm
 name: IBM
+country: US
 primary: '#0F62FE'
 secondary: '#161616'
 verified: 2026-07-13

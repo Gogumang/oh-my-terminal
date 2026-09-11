@@ -91,7 +91,7 @@ mod tests {
         // macOS 라이트 모드에서 흰 배경이 되고, 회사 이름 뱃지가 워터마크처럼 찍혔다.
         let root = std::env::temp_dir()
             .join(format!("oh-my-terminal-iterm2-{}", std::process::id()));
-        let kakao = Brand { key: "kakao".into(), name: "Kakao".into(), primary: "#FEE500".into(),
+        let kakao = Brand { key: "kakao".into(), name: "Kakao".into(), country: None, primary: "#FEE500".into(),
                             secondary: "#333333".into(), logo: None, verified: None,
                             logo_path: None };
         let output = write_profiles(&[kakao], None, &root).unwrap();

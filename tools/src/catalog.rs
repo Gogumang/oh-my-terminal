@@ -168,7 +168,7 @@ pub fn fetch_logos(root: &Path, only: &[String]) -> Result<()> {
         }
         let Some(logo) = &entry.logo else { failed += 1; continue };
         let brand = Brand {
-            key: entry.key.clone(), name: entry.name.clone(),
+            key: entry.key.clone(), name: entry.name.clone(), country: entry.country.clone(),
             primary: entry.primary.clone(), secondary: entry.secondary.clone(),
             verified: None, logo_path: None,
             logo: Some(LogoSource { kind: logo.kind.clone(), url: logo.url.clone(),
@@ -211,7 +211,7 @@ pub fn enable(keys: &[String], root: &Path) -> Result<()> {
             continue;
         };
         let brand = Brand {
-            key: entry.key.clone(), name: entry.name.clone(),
+            key: entry.key.clone(), name: entry.name.clone(), country: entry.country.clone(),
             primary: entry.primary.clone(), secondary: entry.secondary.clone(),
             logo: entry.logo.as_ref().map(|logo| LogoSource {
                 kind: logo.kind.clone(), url: logo.url.clone(), keep_colour: false }),

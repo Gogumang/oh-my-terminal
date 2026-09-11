@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kdan` 을 다시 실행할 것.
 key: kdan
 name: Kdan Mobile
+country: TW
 primary: '#00DC87'
 secondary: '#191919'
 verified: 2026-06-01

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable genie` 을 다시 실행할 것.
 key: genie
 name: Genie Music
+country: KR
 primary: '#FA4065'
 secondary: '#16181D'
 verified: 2026-06-09

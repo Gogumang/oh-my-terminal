@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable shopline` 을 다시 실행할 것.
 key: shopline
 name: SHOPLINE
+country: TW
 primary: '#356DFF'
 secondary: '#16181D'
 verified: 2026-06-08

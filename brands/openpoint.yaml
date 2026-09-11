@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable openpoint` 을 다시 실행할 것.
 key: openpoint
 name: OPENPOINT
+country: TW
 primary: '#8081FF'
 secondary: '#16181D'
 verified: 2026-06-22

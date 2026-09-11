@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable lunit` 을 다시 실행할 것.
 key: lunit
 name: Lunit
+country: KR
 primary: '#1032CF'
 secondary: '#16181D'
 verified: 2026-05-14

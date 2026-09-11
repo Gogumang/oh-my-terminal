@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable ably` 을 다시 실행할 것.
 key: ably
 name: Ably
+country: KR
 primary: '#FF5160'
 secondary: '#1F1F1F'
 verified: 2026-07-12

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable mynavi` 을 다시 실행할 것.
 key: mynavi
 name: マイナビ
+country: JP
 primary: '#0071BB'
 secondary: '#16181D'
 verified: 2026-07-13

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable dealicious` 을 다시 실행할 것.
 key: dealicious
 name: Sinsang Market (Dealicious)
+country: KR
 primary: '#001339'
 secondary: '#16181D'
 verified: 2026-07-02

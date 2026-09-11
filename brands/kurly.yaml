@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kurly` 을 다시 실행할 것.
 key: kurly
 name: Kurly
+country: KR
 primary: '#5F0080'
 secondary: '#333333'
 verified: 2026-07-13

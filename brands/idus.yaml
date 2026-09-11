@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable idus` 을 다시 실행할 것.
 key: idus
 name: idus (Backpackr)
+country: KR
 primary: '#EF7014'
 secondary: '#16181D'
 verified: 2026-07-02

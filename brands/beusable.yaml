@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable beusable` 을 다시 실행할 것.
 key: beusable
 name: Beusable
+country: KR
 primary: '#EC0047'
 secondary: '#16181D'
 verified: 2026-07-02

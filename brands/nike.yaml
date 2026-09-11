@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable nike` 을 다시 실행할 것.
 key: nike
 name: Nike
+country: US
 primary: '#111111'
 secondary: '#16181D'
 verified: 2026-06-06

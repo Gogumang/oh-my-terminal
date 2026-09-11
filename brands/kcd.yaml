@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kcd` 을 다시 실행할 것.
 key: kcd
 name: Korea Credit Data
+country: KR
 primary: '#2D91FF'
 secondary: '#16181D'
 verified: 2026-06-26

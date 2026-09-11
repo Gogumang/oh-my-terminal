@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable cal` 을 다시 실행할 것.
 key: cal
 name: Cal.com
+country: US
 primary: '#111827'
 secondary: '#242424'
 verified: 2026-05-15

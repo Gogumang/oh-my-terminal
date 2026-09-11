@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kakaobank` 을 다시 실행할 것.
 key: kakaobank
 name: KakaoBank
+country: KR
 primary: '#FFE300'
 secondary: '#000000'
 verified: 2026-07-12

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable govuk` 을 다시 실행할 것.
 key: govuk
 name: GOV.UK
+country: UK
 primary: '#1D70B8'
 secondary: '#0B0C0C'
 verified: 2026-06-22

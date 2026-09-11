@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable superhuman` 을 다시 실행할 것.
 key: superhuman
 name: Superhuman
+country: US
 primary: '#5840FF'
 secondary: '#16181D'
 verified: 2026-05-15

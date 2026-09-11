@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable kia` 을 다시 실행할 것.
 key: kia
 name: Kia
+country: KR
 primary: '#05141F'
 secondary: '#16181D'
 verified: 2026-06-22

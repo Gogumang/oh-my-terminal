@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable acer` 을 다시 실행할 것.
 key: acer
 name: 宏碁
+country: TW
 primary: '#80C343'
 secondary: '#222222'
 verified: 2026-07-13

@@ -2,6 +2,7 @@
 # 직접 고치지 말고 `build-themes enable quotabook` 을 다시 실행할 것.
 key: quotabook
 name: Quotabook
+country: KR
 primary: '#00E8C5'
 secondary: '#FFFFFF'
 verified: 2026-07-02
