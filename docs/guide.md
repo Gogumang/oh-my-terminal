@@ -92,10 +92,14 @@ zsh 플러그인입니다. 로고 폰트와 iTerm2 프로필은 플러그인이 
 설정은 iTerm2 프로필 하나입니다. 폴더를 만들거나 명령을 칠 필요가 없고, iTerm2를 재시작할
 필요도 없습니다.
 
-1. **iTerm2 → Settings → Profiles**에서 `<회사> Brand` 프로필(예: `NOL Brand`)을 고르고
-   **Other Actions… → Set as Default**.
+1. **iTerm2 → Settings(⌘,) → Profiles**에서 `<회사> Brand` 프로필(예: `NOL Brand`)을 고르고
+   **Other Actions… → Set as Default**. 이름 앞에 ★가 붙으면 기본 프로필입니다.
 2. 새 창·탭부터 어느 폴더에서나 그 회사 테마가 나옵니다.
 
+![iTerm2 Settings → Profiles에서 NOL Brand를 검색해 고르고 Other Actions… → Set as Default를 누르는 화면](screenshots/set-default-profile.png)
+
+- **설치만 하고 기본 프로필이 `Default`로 남아 있으면 아무것도 바뀌지 않습니다.** 테마가 안
+  나오는 창에서 `echo $ITERM_PROFILE`이 `<회사> Brand`인지 확인하세요.
 - 회사를 바꾸려면 기본 프로필만 다른 `<회사> Brand`로 바꾸면 됩니다.
 - 한 창에서만 써 보려면 ⌘O로 그 프로필 창을 여세요.
 - 브랜드 프로필이 아닌 창에서는 프롬프트를 전혀 건드리지 않습니다.

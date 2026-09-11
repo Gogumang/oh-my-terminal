@@ -104,16 +104,43 @@ git clone https://github.com/Gogumang/oh-my-terminal ~/.zsh/oh-my-terminal
 ~/.zsh/oh-my-terminal/install.sh
 ```
 
-1. 새 iTerm2 창을 엽니다.
-2. **Settings → Profiles**에서 `<회사> Brand`를 고르고 **Other Actions… → Set as Default**를 누릅니다.
-   한 번만 써 보려면 ⌘O로 그 프로필 창을 여세요.
-
 > [!IMPORTANT]
 > zsh-autosuggestions를 쓰고 있다면 `~/.zshrc`에서 빼 주세요. 함께 불리면 내장 자동 제안이
 > 켜지지 않습니다.
 
 Oh My Zsh·zinit·Antigen으로 설치하는 방법, 자동 제안 설정, 알려진 제약은
 [사용 안내](docs/guide.md)에 있습니다.
+
+## 회사 고르기
+
+**설치만 해서는 화면이 바뀌지 않습니다.** 테마는 iTerm2 프로필을 보고 켜지므로, 쓰려는 회사의
+`<회사> Brand` 프로필을 기본 프로필로 정해야 합니다. iTerm2를 재시작할 필요는 없습니다.
+
+1. iTerm2에서 ⌘,를 눌러 **Settings**를 열고 **Profiles** 탭을 누릅니다.
+2. 아래 그림 순서대로 기본 프로필을 바꿉니다.
+   - ① 검색창에 회사 이름을 입력합니다 (예: `nol`).
+   - ② `<회사> Brand` 프로필을 고릅니다.
+   - ③ **Other Actions…** → **Set as Default**를 누릅니다. 이름 앞에 ★가 붙으면 기본 프로필입니다.
+3. **새 탭**(⌘T)이나 **새 창**(⌘N)을 엽니다. 어느 폴더에서나 그 회사 테마가 나옵니다.
+
+![iTerm2 Settings → Profiles에서 NOL Brand를 검색해 고르고 Other Actions… → Set as Default를 누르는 화면](docs/screenshots/set-default-profile.png)
+
+기본 프로필은 그대로 두고 한 창에서만 써 보려면 ⌘O로 Profiles 창을 열어 그 프로필을 여세요.
+
+### 테마가 안 바뀌면
+
+테마가 안 나오는 창에서 프로필 이름을 확인하세요.
+
+```sh
+echo $ITERM_PROFILE
+```
+
+- **`Default`처럼 `Brand`로 끝나지 않는 이름이 나오면** 그 창은 브랜드 프로필이 아닙니다. 브랜드
+  프로필이 아닌 창에서는 일부러 아무것도 바꾸지 않습니다. 위 ③을 다시 하고 새 탭을 여세요.
+- **이미 열려 있던 창은 기본 프로필을 바꿔도 그대로입니다.** 프로필 이름은 창을 열 때 정해지므로
+  반드시 새 탭이나 새 창에서 확인하세요.
+- **`<회사> Brand`가 나오는데도 테마가 없으면** `~/.zshrc`에 플러그인이 들어갔는지 확인하세요.
+  `grep oh-my-terminal ~/.zshrc`에 아무것도 안 나오면 `install.sh`를 다시 실행하세요.
 
 ## 문서
 
