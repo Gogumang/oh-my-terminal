@@ -509,12 +509,15 @@ name = "oh-my-terminal"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "color_quant",
  "image",
+ "png 0.18.1",
  "resvg",
  "serde",
  "serde_json",
  "serde_yaml",
  "tiny-skia",
+ "ttf-parser",
  "ureq",
  "write-fonts",
 ]

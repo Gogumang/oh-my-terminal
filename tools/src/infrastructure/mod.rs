@@ -6,3 +6,5 @@ pub mod logo_shaper;
 pub mod p10k_writer;
 pub mod preview;
 pub mod rasterizer;
+pub mod readme_gallery;
+pub mod theme_gallery;

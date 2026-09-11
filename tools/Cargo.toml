@@ -19,4 +19,9 @@ ureq = { version = "2", features = ["tls", "native-certs"] }
 image = { version = "0.25", default-features = false, features = ["png", "ico", "jpeg"] }
 resvg = "0.45"
 tiny-skia = "0.11"
+# README 테마 그림에 경로 글자를 그릴 때 기반 폰트의 외곽선을 읽는다. resvg가 이미 쓰는 판이다.
+ttf-parser = "0.25"
+# README 테마 그림을 256색 팔레트 PNG로 저장한다 (RGBA 대비 4분의 1 크기). image가 이미 쓰는 판이다.
+color_quant = "1.1"
+png = "0.18"
 write-fonts = { version = "0.38", features = ["read"] }

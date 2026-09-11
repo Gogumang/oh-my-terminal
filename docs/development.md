@@ -32,7 +32,13 @@ cd tools && cargo build --release && cd ..
 tools/target/release/build-themes logos          # 카탈로그 로고를 public/logo/ 에 수집
 tools/target/release/build-themes enable <회사>...  # brands/ 에 추가
 tools/target/release/build-themes                # 테마 생성
+tools/target/release/build-themes gallery        # README 지원 테마 표 + docs/themes/ 그림
 ```
+
+README의 지원 테마 목록은 `gallery`가 `brands/*.yaml`에서 만듭니다 — `<!-- themes:start -->`와
+`<!-- themes:end -->` 사이를 손으로 고치지 마세요. 그림은 셸과 같은 색 계산으로 `~/workspace`
+프롬프트를 그린 것이고, 나라별 묶음은 yaml의 `country`(카탈로그의 두 글자 코드)를 따릅니다.
+카탈로그에 없어 직접 추가한 회사는 `country`를 직접 적어야 하며, 없으면 `gallery`가 멈춥니다.
 
 **기반 폰트는 p10k 권장 폰트인 MesloLGS NF입니다** (`p10k configure`가 설치하는
 `~/Library/Fonts/MesloLGS NF Regular.ttf`). 브랜드 프로필은 이 폰트로 바뀌므로, p10k가 쓰는
@@ -89,6 +95,7 @@ catalog/brands.json           440개 회사 카탈로그 (언어 중립)
 public/logo/                  완성된 로고 (커밋됨, 원본)
 logos/                        빌드 작업물 (빌더가 만듭니다)
 build/preview/                로고 미리보기 (preview 명령)
+docs/themes/                  README 지원 테마 그림 (gallery 명령, 커밋됨)
 tests/autosuggest.zsh         자동 제안 통합 테스트
 licenses/                     옮겨 온 코드의 라이선스 전문
 tools/                        빌드 (메인테이너 전용, Rust)

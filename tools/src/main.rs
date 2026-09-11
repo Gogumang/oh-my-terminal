@@ -6,6 +6,7 @@
 //!   build-themes logos [<키>...]                    카탈로그 로고를 public/logo/ 에 받아 둔다 (기본: 전체)
 //!   build-themes import <키> <URL|파일> [--icon|--badge]   로고를 새 출처로 교체
 //!   build-themes preview <키>...                    로고를 프롬프트 크기로 그려 build/preview/ 에 저장
+//!   build-themes gallery                           README 지원 테마 표와 docs/themes/ 그림을 다시 만든다
 
 mod application;
 mod domain;
@@ -90,6 +91,14 @@ fn main() -> Result<()> {
             }
             for path in infrastructure::preview::write(&root, &base_font()?, &arguments[1..])? {
                 println!("{}", path.display());
+            }
+            Ok(())
+        }
+        Some("gallery") => {
+            let report = application::build_gallery::run(&root, &base_font()?)?;
+            println!("테마 그림 {}개", report.images);
+            for path in &report.outputs {
+                println!("  {}", path.strip_prefix(&root).unwrap_or(path).display());
             }
             Ok(())
         }

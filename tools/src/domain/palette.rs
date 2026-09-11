@@ -206,6 +206,68 @@ pub fn logo_colour(brand: &Brand) -> Rgb {
     if contrast_ratio(black, background) >= contrast_ratio(white, background) { black } else { white }
 }
 
+/// 프롬프트 글자 한 칸의 색 (0~255 채널).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Cell {
+    pub background: [u8; 3],
+    pub foreground: [u8; 3],
+}
+
+/// 셸이 받는 것과 같은 값 — 생성물에는 헥스로 적히므로 같은 반올림을 거친다.
+fn channels(rgb: Rgb) -> [u8; 3] {
+    rgb.map(|channel| (channel.clamp(0.0, 1.0) * 255.0).round() as u8)
+}
+
+/// 세그먼트를 칠할 다섯 색 — 생성물(brands.zsh) 표 한 줄에 적히는 값과 같다.
+#[derive(Clone, Copy, Debug)]
+pub struct SegmentColours {
+    pub start: [u8; 3],
+    pub end: [u8; 3],
+    pub dark_foreground: [u8; 3],
+    pub light_foreground: [u8; 3],
+    pub logo: [u8; 3],
+}
+
+pub fn segment_colours(brand: &Brand) -> SegmentColours {
+    let gradient = gradient(brand);
+    SegmentColours {
+        start: channels(gradient.start),
+        end: channels(gradient.end),
+        dark_foreground: channels(gradient.dark_foreground),
+        light_foreground: channels(gradient.light_foreground),
+        logo: channels(logo_colour(brand)),
+    }
+}
+
+/// 경로 세그먼트의 칸별 색. 셸의 `_brand_gradient`(brands_runtime.zsh)를 정수 계산까지 그대로
+/// 옮겼다 — 문서의 미리보기 그림이 실제 프롬프트와 달라지면 안 되기 때문이다.
+/// `lead`: 시작색 한 가지로 칠하는 앞쪽 칸 수(왼쪽 여백·로고·로고 뒤 한 칸), `length`: 전체 칸 수.
+pub fn segment_cells(colours: SegmentColours, lead: usize, length: usize) -> Vec<Cell> {
+    let SegmentColours { start, end, dark_foreground, light_foreground, logo } = colours;
+    let span = length.saturating_sub(lead);
+
+    (1..=length).map(|position| {
+        let progress = if position > lead && span > 1 {
+            (position - lead - 1) as f64 / (span - 1) as f64
+        } else {
+            0.0
+        };
+        // zsh는 실수 결과를 정수 변수에 넣을 때 소수점 아래를 버린다.
+        let background = [0, 1, 2].map(|index| {
+            let (from, to) = (start[index] as f64, end[index] as f64);
+            (from + (to - from) * progress) as u8
+        });
+        let foreground = if position <= lead {
+            logo
+        } else {
+            let luma = background.iter().zip(LUMA_WEIGHTS)
+                .map(|(channel, weight)| *channel as i32 * weight).sum::<i32>() / 1000;
+            if luma > LUMA_SWITCH { dark_foreground } else { light_foreground }
+        };
+        Cell { background, foreground }
+    }).collect()
+}
+
 /// 브랜드 프로필의 터미널 배경·글자색. 회사와 macOS 라이트/다크 모드에 상관없이 고정한다.
 /// 모드별로 두자 라이트 모드에서 흰 배경이 되어 브랜드 색 프롬프트가 흰 바탕에 떠 보였다.
 pub const TERMINAL_BACKGROUND: &str = "#000000";
@@ -332,6 +394,46 @@ mod tests {
         assert_eq!(logo_colour(&brand("#FEE500", "#333333")), [0.0, 0.0, 0.0], "노란 띠에는 검정");
         assert_eq!(logo_colour(&brand("#3549FF", "#FFFFFF")), [1.0, 1.0, 1.0], "파란 띠에는 흰색");
         assert_eq!(logo_colour(&brand("#000000", "#000000")), [1.0, 1.0, 1.0], "검정 브랜드에는 흰색");
+    }
+
+    const WHITE_TO_BLACK: SegmentColours = SegmentColours {
+        start: [255, 255, 255], end: [0, 0, 0],
+        dark_foreground: [17, 17, 17], light_foreground: [238, 238, 238], logo: [1, 2, 3],
+    };
+
+    #[test]
+    fn 앞쪽_칸은_시작색에_로고색이고_경로_마지막_칸은_끝색이다() {
+        let cells = segment_cells(WHITE_TO_BLACK, 4, 12);
+
+        assert_eq!(cells.len(), 12);
+        for cell in &cells[..4] {
+            assert_eq!(*cell, Cell { background: [255, 255, 255], foreground: [1, 2, 3] }, "앞쪽 칸");
+        }
+        assert_eq!(cells[4].background, [255, 255, 255], "경로 첫 칸은 시작색에서 출발한다");
+        assert_eq!(cells[11].background, [0, 0, 0], "경로 끝 칸은 끝색이어야 한다");
+    }
+
+    #[test]
+    fn 경로_칸의_배경은_셸처럼_소수점을_버리고_글자색은_밝기로_고른다() {
+        // 경로 3칸: 진행률 0, 0.5, 1 → 255 + (0-255)*0.5 = 127.5 는 셸에서 127이 된다.
+        let cells = segment_cells(WHITE_TO_BLACK, 1, 4);
+
+        assert_eq!(cells[2], Cell { background: [127, 127, 127], foreground: [238, 238, 238] },
+                   "가운데 칸 (밝기 127 ≤ {LUMA_SWITCH} 이라 밝은 글자)");
+        assert_eq!(cells[1].foreground, [17, 17, 17], "밝은 시작 칸은 어두운 글자");
+        assert_eq!(cells[3].foreground, [238, 238, 238], "어두운 끝 칸은 밝은 글자");
+    }
+
+    #[test]
+    fn 브랜드의_세그먼트_색은_그라데이션과_로고색에서_온다() {
+        let subject = brand("#FEE500", "#333333");
+        let gradient = gradient(&subject);
+
+        let colours = segment_colours(&subject);
+
+        assert_eq!(rgb_to_hex(colours.start.map(|c| c as f64 / 255.0)), rgb_to_hex(gradient.start));
+        assert_eq!(rgb_to_hex(colours.end.map(|c| c as f64 / 255.0)), rgb_to_hex(gradient.end));
+        assert_eq!(colours.logo, [0, 0, 0], "노란 띠의 로고는 검정");
     }
 
     #[test]
