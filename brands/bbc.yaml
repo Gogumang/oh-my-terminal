@@ -6,7 +6,5 @@ primary: '#000000'
 secondary: '#16181D'
 verified: 2026-06-22
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=128
-paths:
-- ~/Desktop/bbc(|/*)
+  kind: import-mark
+  url: https://upload.wikimedia.org/wikipedia/commons/4/41/BBC_Logo_2021.svg

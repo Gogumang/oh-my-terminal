@@ -6,7 +6,5 @@ primary: '#EB0014'
 secondary: '#16181D'
 verified: 2026-06-03
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=lezhin.com&sz=256
-paths:
-- ~/Desktop/lezhin(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/be/76/7b/be767bb7-dc2f-fd40-c1fa-82f5e8426b4b/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/512x512bb.jpg

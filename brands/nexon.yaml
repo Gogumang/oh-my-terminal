@@ -6,7 +6,5 @@ primary: '#00DE5A'
 secondary: '#16181D'
 verified: 2026-06-09
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=www.nexon.com&sz=128
-paths:
-- ~/Desktop/nexon(|/*)
+  kind: import-mark
+  url: https://cdn.simpleicons.org/nexon

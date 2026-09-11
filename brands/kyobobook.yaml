@@ -8,5 +8,3 @@ verified: 2026-06-26
 logo:
   kind: favicon
   url: https://contents.kyobobook.co.kr/resources/fo/images/common/ink/favicon/favicon_256x256.png
-paths:
-- ~/Desktop/kyobobook(|/*)

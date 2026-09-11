@@ -6,7 +6,5 @@ primary: '#FFE300'
 secondary: '#000000'
 verified: 2026-07-12
 logo:
-  kind: simpleicons
-  url: https://cdn.simpleicons.org/kakaotalk/000000
-paths:
-- ~/Desktop/kakaobank(|/*)
+  kind: import-badge
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/40/b4/4c/40b44cfe-eb33-ce88-ff12-6388e8a6a120/AppIcon_real-0-0-1x_U007ephone-0-1-0-sRGB-85-220.png/512x512bb.jpg

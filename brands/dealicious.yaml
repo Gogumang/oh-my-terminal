@@ -6,7 +6,5 @@ primary: '#001339'
 secondary: '#16181D'
 verified: 2026-07-02
 logo:
-  kind: favicon
-  url: https://dealicious.kr/assets/images/deali_logo_square.png
-paths:
-- ~/Desktop/dealicious(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/8e/63/28/8e6328ef-8e65-778d-eb71-9d0bb3f95b16/AppIcon-0-0-1x_U007ephone-0-1-0-sRGB-85-220.png/512x512bb.jpg

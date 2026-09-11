@@ -6,7 +6,5 @@ primary: '#3A46CD'
 secondary: '#1A2232'
 verified: 2026-07-13
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=sktelecom.com&sz=128
-paths:
-- ~/Desktop/sktelecom(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/f3/ca/f3/f3caf366-66db-0572-9663-dd719a2c8e3b/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg

@@ -6,7 +6,5 @@ primary: '#FA4065'
 secondary: '#16181D'
 verified: 2026-06-09
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=genie.co.kr&sz=128
-paths:
-- ~/Desktop/genie(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/12/60/f7/1260f77c-f0eb-dda6-cca6-41bd7f5f6608/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg

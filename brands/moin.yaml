@@ -6,7 +6,5 @@ primary: '#0082FF'
 secondary: '#16181D'
 verified: 2026-07-02
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=themoin.com&sz=128
-paths:
-- ~/Desktop/moin(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/8a/a1/55/8aa15501-77aa-af5b-fe94-782106a6079b/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg

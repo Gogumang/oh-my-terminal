@@ -22,18 +22,24 @@ pub struct Report {
     pub outputs: Vec<PathBuf>,
 }
 
+/// 로고를 다시 준비해야 하는지. logos/ 에 없거나, 커밋된 원본(public/logo)이 있으면 준비한다.
+///
+/// logos/ 는 작업물이다. 복사본이 있다고 그대로 쓰자 public/logo 에서 교체한 로고 43개가
+/// 폰트에 하나도 반영되지 않았다 — 생성물이 교체 전과 바이트까지 같았다.
+fn needs_prepare(brand: &Brand, committed: &Path) -> bool {
+    brand.logo_path.is_none() || committed.join(format!("{}.png", brand.key)).exists()
+}
+
 pub fn run(root: &Path, base_font: &Path) -> Result<Report> {
     let catalog = YamlBrandCatalog::new(root.join("brands"), root.join("logos"));
-    let mut repository = LogoRepository::new(root.join("logos"), root.join("public/logo"));
+    let committed = root.join("public/logo");
+    let mut repository = LogoRepository::new(root.join("logos"), &committed);
 
     let mut brands = catalog.load()?;
-    // 로고 파일은 상표라 저장소에 커밋하지 않는다 — 없으면 출처에서 받아 재현한다.
-    let missing: Vec<Brand> = brands.iter().filter(|b| b.logo_path.is_none()).cloned().collect();
-    if !missing.is_empty() {
-        for brand in &missing {
-            repository.prepare(brand);
+    for brand in brands.iter_mut() {
+        if needs_prepare(brand, &committed) {
+            brand.logo_path = repository.prepare(brand);
         }
-        brands = catalog.load()?;
     }
 
     let artifact = font_writer::write_font(base_font, &brands, root)?;
@@ -66,10 +72,39 @@ pub fn run(root: &Path, base_font: &Path) -> Result<Report> {
 
     let prompt = p10k_writer::write_prompt(&brands, &glyphs, root)?;
     let profiles = iterm2_writer::write_profiles(
-        &brands, artifact.as_ref().map(|_| font_writer::POSTSCRIPT), root)?;
+        &brands, artifact.as_ref().map(|a| a.postscript.as_str()), root)?;
 
     let mut outputs = vec![prompt];
     if let Some(artifact) = &artifact { outputs.push(artifact.path.clone()); }
     outputs.push(profiles);
     Ok(Report { brands: reports, warnings, outputs })
+}
+
+#[cfg(test)]
+#[allow(non_snake_case)]   // 테스트 이름은 동작 서술형 한국어를 쓴다
+mod tests {
+    use super::*;
+
+    fn brand(key: &str, logo_path: Option<PathBuf>) -> Brand {
+        Brand { key: key.into(), name: key.into(), primary: "#0064FF".into(),
+                secondary: "#0064FF".into(), logo: None, verified: None, logo_path }
+    }
+
+    #[test]
+    fn 커밋된_로고가_있으면_작업_폴더에_복사본이_있어도_다시_가져온다() {
+        let root = std::env::temp_dir()
+            .join(format!("oh-my-terminal-prepare-{}", std::process::id()));
+        let committed = root.join("public/logo");
+        std::fs::create_dir_all(&committed).unwrap();
+        std::fs::write(committed.join("replaced.png"), b"png").unwrap();
+        let stale_copy = Some(root.join("logos/replaced.png"));
+        let downloaded = Some(root.join("logos/downloaded.png"));
+
+        let decisions = [needs_prepare(&brand("replaced", stale_copy), &committed),
+                         needs_prepare(&brand("downloaded", downloaded), &committed),
+                         needs_prepare(&brand("missing", None), &committed)];
+        let _ = std::fs::remove_dir_all(&root);
+        // 커밋된 원본은 늘 새로, 원격에서 받아 둔 작업물은 그대로, 없는 것은 준비한다.
+        assert_eq!(decisions, [true, false, true]);
+    }
 }

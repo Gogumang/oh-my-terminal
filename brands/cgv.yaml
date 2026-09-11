@@ -6,7 +6,5 @@ primary: '#121212'
 secondary: '#121212'
 verified: 2026-07-13
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=cgv.co.kr&sz=128
-paths:
-- ~/Desktop/cgv(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/ec/c0/c8/ecc0c8f2-3c03-de55-2d61-e3ea4a22ff31/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg

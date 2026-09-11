@@ -8,5 +8,3 @@ verified: 2026-06-17
 logo:
   kind: favicon
   url: https://www.google.com/s2/favicons?domain=workday.com&sz=128
-paths:
-- ~/Desktop/workday(|/*)

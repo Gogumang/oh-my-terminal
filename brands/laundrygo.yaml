@@ -8,5 +8,3 @@ verified: 2026-06-11
 logo:
   kind: favicon
   url: https://www.laundrygo.com/wp-content/uploads/2022/12/favicon_web.png
-paths:
-- ~/Desktop/laundrygo(|/*)

@@ -6,7 +6,5 @@ primary: '#000000'
 secondary: '#201D1D'
 verified: 2026-05-15
 logo:
-  kind: github
-  url: https://github.com/opencode-ai.png?size=512
-paths:
-- ~/Desktop/opencode.ai(|/*)
+  kind: import-mark
+  url: https://cdn.simpleicons.org/opencode

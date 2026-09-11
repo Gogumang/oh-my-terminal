@@ -6,7 +6,5 @@ primary: '#5840FF'
 secondary: '#16181D'
 verified: 2026-05-15
 logo:
-  kind: github
-  url: https://github.com/superhuman.png?size=512
-paths:
-- ~/Desktop/superhuman(|/*)
+  kind: import-badge
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/77/9d/3b/779d3b62-87c3-c41c-69e8-ad3932a59aa6/AppIcon-Default-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/512x512bb.jpg

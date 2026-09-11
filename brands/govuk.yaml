@@ -6,7 +6,5 @@ primary: '#1D70B8'
 secondary: '#0B0C0C'
 verified: 2026-06-22
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=gov.uk&sz=128
-paths:
-- ~/Desktop/govuk(|/*)
+  kind: import-icon
+  url: https://raw.githubusercontent.com/alphagov/govuk-frontend/main/packages/govuk-frontend/src/govuk/assets/images/favicon.svg

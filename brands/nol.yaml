@@ -7,5 +7,3 @@ secondary: "#F5F6F9"
 logo:
   kind: favicon
   url: "https://www.google.com/s2/favicons?domain=yanolja.com&sz=128"
-paths:
-  - "~/Desktop/nol(|/*)"

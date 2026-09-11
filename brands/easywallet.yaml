@@ -6,7 +6,5 @@ primary: '#007BC6'
 secondary: '#16181D'
 verified: 2026-06-22
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=easywallet.easycard.com.tw&sz=128
-paths:
-- ~/Desktop/easywallet(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/9f/2e/2b/9f2e2b2a-abd9-1acd-01b7-cede5cd79b8f/AppIcon-0-0-1x_U007emarketing-0-6-0-85-220.png/512x512bb.jpg

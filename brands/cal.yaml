@@ -6,7 +6,5 @@ primary: '#111827'
 secondary: '#242424'
 verified: 2026-05-15
 logo:
-  kind: simpleicons
-  url: https://cdn.simpleicons.org/caldotcom/000000
-paths:
-- ~/Desktop/cal(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/1f/c4/65/1fc465f0-c144-e7d8-c44c-94cc415e822e/cal-logo-0-0-1x_U007ephone-0-1-P3-85-220.png/512x512bb.jpg

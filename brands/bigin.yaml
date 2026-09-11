@@ -6,7 +6,5 @@ primary: '#006FFF'
 secondary: '#16181D'
 verified: 2026-06-26
 logo:
-  kind: favicon
-  url: https://www.bigin.io/favicon.ico
-paths:
-- ~/Desktop/bigin(|/*)
+  kind: import-mark
+  url: https://www.zohowebstatic.com/sites/zweb/images/productlogos/bigin.svg

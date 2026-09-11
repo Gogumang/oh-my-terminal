@@ -8,5 +8,3 @@ verified: 2026-07-11
 logo:
   kind: favicon
   url: https://static.toss.im/icons/png/4x/icon-toss-logo.png
-paths:
-- ~/Desktop/toss(|/*)

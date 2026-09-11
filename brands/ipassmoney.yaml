@@ -6,7 +6,5 @@ primary: '#53B232'
 secondary: '#16181D'
 verified: 2026-06-22
 logo:
-  kind: favicon
-  url: https://static01-ipass.cdn.hinet.net/ipassweb/iPassWebV2/Content/style2018/img/core-img/logo.png
-paths:
-- ~/Desktop/ipassmoney(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/90/32/00/90320063-c79d-1705-6b56-a0c8c4bb52d9/AppIcon-0-0-1x_U007ephone-0-1-0-sRGB-85-220.png/512x512bb.jpg

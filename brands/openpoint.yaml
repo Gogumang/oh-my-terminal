@@ -6,7 +6,5 @@ primary: '#8081FF'
 secondary: '#16181D'
 verified: 2026-06-22
 logo:
-  kind: favicon
-  url: https://www.openpoint.com.tw/cdn/images/openpoint-logo.png
-paths:
-- ~/Desktop/openpoint(|/*)
+  kind: import-badge
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/45/2a/ac/452aacd0-952c-e68e-21b7-829bcc419d89/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg

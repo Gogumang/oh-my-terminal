@@ -6,7 +6,5 @@ primary: '#DDAA00'
 secondary: '#E6E6E6'
 verified: 2026-06-10
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=abema.tv&sz=128
-paths:
-- ~/Desktop/abema(|/*)
+  kind: import-icon
+  url: 'https://image.p-c2-x.abema-tv.com/image/assets/img_icon.png?height=512&quality=100&version=20200413&width=512'

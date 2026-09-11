@@ -8,5 +8,3 @@ verified: 2026-06-22
 logo:
   kind: favicon
   url: https://www.fubon.com/banking/common_content/images/favicon.ico
-paths:
-- ~/Desktop/fubon(|/*)

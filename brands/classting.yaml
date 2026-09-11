@@ -8,5 +8,3 @@ verified: 2026-06-03
 logo:
   kind: favicon
   url: https://www.google.com/s2/favicons?domain=classting.com&sz=256
-paths:
-- ~/Desktop/classting(|/*)

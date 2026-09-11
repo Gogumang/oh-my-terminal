@@ -6,7 +6,5 @@ primary: '#FF4F00'
 secondary: '#16181D'
 verified: 2026-07-13
 logo:
-  kind: simpleicons
-  url: https://cdn.simpleicons.org/zapier/000000
-paths:
-- ~/Desktop/zapier(|/*)
+  kind: import-icon
+  url: https://github.com/zapier.png?size=512

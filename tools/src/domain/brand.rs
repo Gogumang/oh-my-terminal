@@ -23,15 +23,14 @@ pub struct Brand {
     pub verified: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub logo: Option<LogoSource>,
-    #[serde(default)]
-    pub paths: Vec<String>,
     /// 준비된 로고 PNG 경로. 카탈로그가 채운다.
     #[serde(skip)]
     pub logo_path: Option<std::path::PathBuf>,
 }
 
 impl Brand {
-    pub fn keeps_original_colour(&self) -> bool {
-        self.logo.as_ref().is_some_and(|logo| logo.keep_colour)
+    /// iTerm2 프로필 이름. 셸은 세션의 ITERM_PROFILE을 이 이름과 맞춰 회사를 알아낸다.
+    pub fn profile_name(&self) -> String {
+        format!("{} Brand", self.name)
     }
 }

@@ -6,7 +6,5 @@ primary: '#242428'
 secondary: '#000000'
 verified: 2026-07-12
 logo:
-  kind: github
+  kind: import-icon
   url: https://github.com/channel-io.png?size=512
-paths:
-- ~/Desktop/channeltalk(|/*)

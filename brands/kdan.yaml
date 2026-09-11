@@ -8,5 +8,3 @@ verified: 2026-06-01
 logo:
   kind: favicon
   url: https://www.kdan.com/apple-touch-icon-152x152.png
-paths:
-- ~/Desktop/kdan(|/*)

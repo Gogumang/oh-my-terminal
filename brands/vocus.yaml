@@ -6,7 +6,5 @@ primary: '#FF485A'
 secondary: '#16181D'
 verified: 2026-06-17
 logo:
-  kind: favicon
-  url: https://vocus.cc/static/img/icon-180x180.png
-paths:
-- ~/Desktop/vocus(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/f9/9e/de/f99ede88-deab-8131-4366-6f6540298adb/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg

@@ -6,7 +6,5 @@ primary: '#11AAC1'
 secondary: '#16181D'
 verified: 2026-06-22
 logo:
-  kind: favicon
-  url: https://i2.bahamut.com.tw/apple-touch-icon-144x144.png
-paths:
-- ~/Desktop/bahamut(|/*)
+  kind: import-icon
+  url: https://i2.bahamut.com.tw/favicon.svg

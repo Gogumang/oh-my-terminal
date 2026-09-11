@@ -6,7 +6,5 @@ primary: '#FF5700'
 secondary: '#16181D'
 verified: 2026-06-26
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=moreh.io&sz=128
-paths:
-- ~/Desktop/moreh(|/*)
+  kind: import-icon
+  url: https://moreh.io/assets/moreh-icon-512x512-1.png

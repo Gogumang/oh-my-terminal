@@ -1,15 +1,18 @@
 //! 진입점 — 어댑터를 조립해 유스케이스를 실행한다 (interfaces 레이어).
 //!
-//!   build-themes              테마 생성 (기본)
-//!   build-themes catalog <경로>   oh-my-design 데이터셋 → catalog/brands.json
-//!   build-themes enable <키>...   카탈로그에서 회사를 골라 brands/ 에 추가
-//!   build-themes logos [<키>...]  카탈로그 로고를 public/logo/ 에 받아 둔다 (기본: 전체)
+//!   build-themes                                   테마 생성 (기본)
+//!   build-themes catalog <경로>                     oh-my-design 데이터셋 → catalog/brands.json
+//!   build-themes enable <키>...                     카탈로그에서 회사를 골라 brands/ 에 추가
+//!   build-themes logos [<키>...]                    카탈로그 로고를 public/logo/ 에 받아 둔다 (기본: 전체)
+//!   build-themes import <키> <URL|파일> [--icon|--badge]   로고를 새 출처로 교체
+//!   build-themes preview <키>...                    로고를 프롬프트 크기로 그려 build/preview/ 에 저장
 
 mod application;
 mod domain;
 mod infrastructure;
 
 mod catalog;
+mod logo_import;
 
 use std::path::{Path, PathBuf};
 
@@ -34,12 +37,12 @@ fn project_root() -> Result<PathBuf> {
     }
 }
 
-/// 로고 글리프를 얹을 기반 폰트.
+/// 로고 글리프를 얹을 기반 폰트. 기본은 p10k 권장 폰트인 MesloLGS NF.
 ///
-/// 예전에는 MesloLGS NF로 못박아 뒀는데, 브랜드 프로필이 그 폰트를 주 폰트로 지정하므로
-/// 한글 폰트(D2Coding 등)를 쓰던 사용자는 회사 폴더에서 한글이 시스템 폴백으로 떨어졌다.
-/// 지금 쓰는 폰트를 그대로 패치해야 원래 보던 글자가 유지된다.
-///   OH_MY_TERMINAL_BASE_FONT=/path/to/Font.ttf 로 지정
+/// 브랜드 프로필은 이 폰트를 주 폰트로 지정하므로, p10k가 쓰는 Nerd Font 아이콘(git 브랜치 등)이
+/// 기반 폰트에 있어야 한다. D2Coding으로 만들었더니 한글 모양은 유지됐지만 그 아이콘이 전부
+/// 사라졌다. 다른 폰트를 쓰려면 Nerd Font 버전을 지정할 것.
+///   OH_MY_TERMINAL_BASE_FONT=/path/to/Font.ttf
 fn base_font() -> Result<PathBuf> {
     if let Ok(configured) = std::env::var("OH_MY_TERMINAL_BASE_FONT") {
         let path = PathBuf::from(configured);
@@ -73,6 +76,22 @@ fn main() -> Result<()> {
                 return Err(anyhow!("사용법: build-themes enable <회사키>..."));
             }
             catalog::enable(&arguments[1..], &root)
+        }
+        Some("import") => {
+            let (Some(key), Some(source)) = (arguments.get(1), arguments.get(2)) else {
+                return Err(anyhow!("사용법: build-themes import <회사키> <URL|파일> [--icon|--badge]"));
+            };
+            let mode = logo_import::Mode::parse(arguments.get(3).map(String::as_str))?;
+            logo_import::import(key, source, mode, &root)
+        }
+        Some("preview") => {
+            if arguments.len() < 2 {
+                return Err(anyhow!("사용법: build-themes preview <회사키>..."));
+            }
+            for path in infrastructure::preview::write(&root, &base_font()?, &arguments[1..])? {
+                println!("{}", path.display());
+            }
+            Ok(())
         }
         _ => build(&root),
     }

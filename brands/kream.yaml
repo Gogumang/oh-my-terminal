@@ -8,5 +8,3 @@ verified: 2026-07-13
 logo:
   kind: favicon
   url: https://www.google.com/s2/favicons?domain=kream.co.kr&sz=256
-paths:
-- ~/Desktop/kream(|/*)

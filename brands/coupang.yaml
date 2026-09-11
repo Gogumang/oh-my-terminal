@@ -6,7 +6,5 @@ primary: '#000000'
 secondary: '#000000'
 verified: 2026-07-13
 logo:
-  kind: favicon
-  url: https://www.coupang.com/favicon.ico
-paths:
-- ~/Desktop/coupang(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/f6/bb/4c/f6bb4c0b-674c-7033-f039-494e2731b308/AppIcon-0-0-1x_U007emarketing-0-11-0-sRGB-85-220.png/512x512bb.jpg

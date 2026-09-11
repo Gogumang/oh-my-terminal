@@ -6,7 +6,5 @@ primary: '#DA3238'
 secondary: '#16181D'
 verified: 2026-06-10
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=teamblind.com&sz=128
-paths:
-- ~/Desktop/teamblind(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/57/a9/d6/57a9d657-7cb8-6421-d169-f79bbd11838a/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg

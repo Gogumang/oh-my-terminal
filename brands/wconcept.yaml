@@ -6,7 +6,5 @@ primary: '#000000'
 secondary: '#16181D'
 verified: 2026-05-27
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=wconcept.co.kr&sz=128
-paths:
-- ~/Desktop/wconcept(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/8c/98/be/8c98be3f-3910-749c-f469-aab20b34653e/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg

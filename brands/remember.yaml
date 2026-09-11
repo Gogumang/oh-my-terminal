@@ -6,7 +6,5 @@ primary: '#000000'
 secondary: '#222222'
 verified: 2026-07-13
 logo:
-  kind: favicon
-  url: https://cdn.rememberapp.co.kr/logos/remember/rmbr_og_image.png
-paths:
-- ~/Desktop/remember(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/87/22/6c/87226c4d-1c3e-bcfb-66c1-262823f625de/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg

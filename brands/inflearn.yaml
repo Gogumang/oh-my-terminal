@@ -6,7 +6,5 @@ primary: '#00C471'
 secondary: '#16181D'
 verified: 2026-07-13
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=inflearn.com&sz=256
-paths:
-- ~/Desktop/inflearn(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/a1/f1/ca/a1f1ca68-8e58-2774-8603-75be43c26790/AppIcon-0-0-1x_U007emarketing-0-10-0-85-220.png/512x512bb.jpg

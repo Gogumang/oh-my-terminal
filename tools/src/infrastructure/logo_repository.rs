@@ -38,6 +38,12 @@ impl LogoRepository {
     }
 
     pub fn prepare(&mut self, brand: &Brand) -> Option<PathBuf> {
+        // logos/ 는 gitignore 대상이라 새로 받은 저장소에는 없다. 만들지 않으면 커밋된 로고
+        // 복사가 전부 실패해, 빌드는 성공하는데 로고 없는 폰트·프롬프트가 조용히 생성된다.
+        if let Err(error) = std::fs::create_dir_all(&self.directory) {
+            self.notes.push(format!("{}: 로고 작업 디렉터리 생성 실패 ({error})", brand.name));
+            return None;
+        }
         let target = self.directory.join(format!("{}.png", brand.key));
 
         // 커밋된 완성 로고가 있으면 그대로 쓴다 — 가공도 네트워크도 없다.
@@ -117,33 +123,79 @@ impl LogoRepository {
     }
 
     fn download(&self, url: &str) -> Result<RgbaImage> {
-        let response = ureq::AgentBuilder::new()
-            .timeout(TIMEOUT).user_agent("Mozilla/5.0 (oh-my-terminal)").build()
-            .get(url).call()?;
-        let mut data = Vec::new();
-        std::io::Read::read_to_end(&mut response.into_reader(), &mut data)?;
-        if data.is_empty() {
-            return Err(anyhow!("빈 응답"));
-        }
-        let head = &data[..data.len().min(400)];
-        if head.starts_with(b"<svg") || twoway_contains(head, b"<svg") {
-            let rendered = rasterize_svg(&data, LOGO_SIZE)?;
+        let data = fetch_bytes(url)?;
+        let image = decode_image(&data)?;
+        if is_svg(&data) {
             // resvg 알파는 정확하니 그대로 믿는다. 다만 <rect>로 배경을 꽉 칠한 SVG
             // (무신사 favicon.svg)는 투명 영역이 거의 없다 — 그때만 배경을 걷어낸다.
-            return Ok(if shaper::needs_background_strip(&rendered) {
-                shaper::strip_uniform_background(&rendered)
+            return Ok(if shaper::needs_background_strip(&image) {
+                shaper::strip_uniform_background(&image)
             } else {
-                rendered
+                image
             });
         }
-        if twoway_contains(head, b"<html") || twoway_contains(head, b"<!DOCTYPE") {
-            return Err(anyhow!("이미지가 아니라 HTML이 왔다 (봇 차단으로 보인다)"));
-        }
-        let decoded = image::load_from_memory(&data)?.to_rgba8();
-        Ok(shaper::strip_uniform_background(&decoded))
+        Ok(shaper::strip_uniform_background(&image))
     }
+}
+
+/// 원격 파일을 받는다. 봇 차단을 피하려고 브라우저 계열 User-Agent를 쓴다.
+pub fn fetch_bytes(url: &str) -> Result<Vec<u8>> {
+    let response = ureq::AgentBuilder::new()
+        .timeout(TIMEOUT).user_agent("Mozilla/5.0 (oh-my-terminal)").build()
+        .get(url).call()?;
+    let mut data = Vec::new();
+    std::io::Read::read_to_end(&mut response.into_reader(), &mut data)?;
+    if data.is_empty() {
+        return Err(anyhow!("빈 응답"));
+    }
+    Ok(data)
+}
+
+/// 로고 파일(SVG·PNG·JPEG·ICO)을 RGBA로 푼다. 배경은 건드리지 않는다 —
+/// 원본 모양에 맞는 가공은 부르는 쪽이 고른다.
+pub fn decode_image(data: &[u8]) -> Result<RgbaImage> {
+    if is_svg(data) {
+        return rasterize_svg(data, LOGO_SIZE);
+    }
+    let head = &data[..data.len().min(400)];
+    if twoway_contains(head, b"<html") || twoway_contains(head, b"<!DOCTYPE") {
+        return Err(anyhow!("이미지가 아니라 HTML이 왔다 (봇 차단으로 보인다)"));
+    }
+    Ok(image::load_from_memory(data)?.to_rgba8())
+}
+
+fn is_svg(data: &[u8]) -> bool {
+    let head = &data[..data.len().min(400)];
+    head.starts_with(b"<svg") || twoway_contains(head, b"<svg")
 }
 
 fn twoway_contains(haystack: &[u8], needle: &[u8]) -> bool {
     haystack.windows(needle.len()).any(|window| window == needle)
+}
+
+#[cfg(test)]
+#[allow(non_snake_case)]   // 테스트 이름은 동작 서술형 한국어를 쓴다
+mod tests {
+    use super::*;
+
+    #[test]
+    fn 작업_디렉터리가_없어도_커밋된_로고를_가져온다() {
+        // 새로 받은 저장소에서 빌드하자 279개 복사가 전부 실패했는데 빌드는 성공해,
+        // 폰트 없이 로고 빠진 프롬프트와 프로필이 만들어졌다.
+        let root = std::env::temp_dir()
+            .join(format!("oh-my-terminal-logos-{}", std::process::id()));
+        let committed = root.join("public/logo");
+        std::fs::create_dir_all(&committed).unwrap();
+        std::fs::write(committed.join("t.png"), b"png").unwrap();
+
+        let mut repository = LogoRepository::new(root.join("logos"), &committed);
+        let brand = Brand { key: "t".into(), name: "T".into(), primary: "#0064FF".into(),
+                            secondary: "#0064FF".into(), logo: None, verified: None,
+                            logo_path: None };
+        let prepared = repository.prepare(&brand);
+        let _ = std::fs::remove_dir_all(&root);
+
+        assert!(repository.notes.is_empty(), "노트가 남았다: {:?}", repository.notes);
+        assert_eq!(prepared, Some(root.join("logos/t.png")));
+    }
 }

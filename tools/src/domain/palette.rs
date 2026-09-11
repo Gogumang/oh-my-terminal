@@ -8,10 +8,9 @@
 
 use crate::domain::brand::Brand;
 
-pub const CONTRAST_BODY: f64 = 7.0;
 pub const CONTRAST_ACCENT: f64 = 4.5;
 
-/// 터미널 다크 배경(#121212 근처)의 상대 휘도.
+/// 이보다 1.5배 어두운 브랜드색은 검정 터미널 배경과 구분되지 않는다고 본다 (#121212 근처).
 const TERMINAL_BACKGROUND_LUMINANCE: f64 = 0.008;
 
 /// 셸(brands.zsh)이 글자색을 전환하는 기준.
@@ -31,12 +30,9 @@ const GRADIENT_DEPTHS: [f64; 8] = [0.55, 0.45, 0.35, 0.28, 0.22, 0.17, 0.12, 0.0
 const NUDGES: [f64; 11] = [0.0, 0.04, -0.04, 0.08, -0.08, 0.12, -0.12, 0.16, -0.16, 0.20, -0.20];
 
 /// 의미가 보존된 중립 ANSI 팔레트. 브랜드별로 건드리지 않는다.
-pub const ANSI_DARK: [&str; 16] = [
+pub const ANSI: [&str; 16] = [
     "#1C1F24", "#E05561", "#8CC265", "#D18F52", "#4AA5F0", "#C162DE", "#42B3C2", "#D7DAE0",
     "#6B7280", "#FF616E", "#A5E075", "#F0A45D", "#4DC4FF", "#DE73FF", "#4CD1E0", "#F3F4F5"];
-pub const ANSI_LIGHT: [&str; 16] = [
-    "#2E3440", "#C33F49", "#4B801F", "#9A6200", "#1B6FC4", "#8B3FB0", "#0E7A8C", "#4C566A",
-    "#6B7280", "#A32B34", "#3A6614", "#7D4E00", "#12579B", "#6E2E8C", "#0A5F6D", "#2E3440"];
 
 pub type Rgb = [f64; 3];
 
@@ -199,24 +195,23 @@ pub fn gradient(brand: &Brand) -> Gradient {
     best.expect("후보가 최소 하나는 있다")
 }
 
-/// 로고를 세그먼트 배경 위에서 읽히는 색으로 칠한다. 프롬프트 글자와 같은 배경을
-/// 기준으로 계산해야 둘이 어긋나지 않는다.
-pub fn logo_tint(brand: &Brand) -> [u8; 3] {
+/// 로고 색. 띠 시작색 위에서 검정과 흰색 중 대비가 큰 쪽을 쓴다.
+///
+/// 로고는 글자 몇 칸 크기로 작게 그려져 글자보다 강한 대비가 필요하다. 예전에는 글자색처럼
+/// 브랜드 보조색을 4.5:1까지만 밀었는데, 어두운 띠 위의 회색 로고(삼성·우버)가 얼룩으로만 보였다.
+/// iTerm2 GPU 렌더러는 로고를 그 칸의 글자색으로 칠하므로 셸도 로고 칸에 이 색을 쓴다.
+pub fn logo_colour(brand: &Brand) -> Rgb {
     let background = gradient(brand).start;
-    let seed = hex_to_rgb(&brand.secondary);
-    let candidates = [push_to_contrast(seed, background, CONTRAST_ACCENT, false),
-                      push_to_contrast(seed, background, CONTRAST_ACCENT, true)];
-    let (colour, _) = candidates.into_iter()
-        .max_by(|a, b| {
-            let key = |item: &(Rgb, bool)| (item.1, contrast_ratio(item.0, background));
-            key(a).partial_cmp(&key(b)).unwrap()
-        }).unwrap();
-    [(colour[0] * 255.0).round() as u8,
-     (colour[1] * 255.0).round() as u8,
-     (colour[2] * 255.0).round() as u8]
+    let (black, white) = ([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]);
+    if contrast_ratio(black, background) >= contrast_ratio(white, background) { black } else { white }
 }
 
-pub struct ModePalette {
+/// 브랜드 프로필의 터미널 배경·글자색. 회사와 macOS 라이트/다크 모드에 상관없이 고정한다.
+/// 모드별로 두자 라이트 모드에서 흰 배경이 되어 브랜드 색 프롬프트가 흰 바탕에 떠 보였다.
+pub const TERMINAL_BACKGROUND: &str = "#000000";
+pub const TERMINAL_FOREGROUND: &str = "#FFFFFF";
+
+pub struct TerminalPalette {
     pub background: Rgb,
     pub foreground: Rgb,
     pub accent: Rgb,
@@ -224,23 +219,21 @@ pub struct ModePalette {
     pub ansi: Vec<Rgb>,
 }
 
-/// iTerm2 프로필용 다크/라이트 팔레트. ANSI 16색은 중립 팔레트를 그대로 쓴다.
-pub fn terminal_palette(brand: &Brand) -> (ModePalette, ModePalette) {
+/// iTerm2 프로필 팔레트. 배경·글자는 고정하고 커서·링크·탭에만 브랜드 색을 쓴다.
+/// ANSI 16색은 중립 팔레트를 그대로 쓴다.
+pub fn terminal_palette(brand: &Brand) -> TerminalPalette {
+    let background = hex_to_rgb(TERMINAL_BACKGROUND);
     let primary = hex_to_rgb(&brand.primary);
-    let secondary = hex_to_rgb(&brand.secondary);
-    let build = |lightness: f64, ansi: &[&str; 16], lighter: bool| {
-        let background = with_lightness(secondary, lightness);
-        let seed = with_lightness(secondary, if lighter { 0.90 } else { 0.15 });
-        let (foreground, _) = push_to_contrast(seed, background, CONTRAST_BODY, lighter);
-        let (accent, _) = push_to_contrast(primary, background, CONTRAST_ACCENT, lighter);
-        ModePalette {
-            background, foreground, accent,
-            // 선택 영역에 액센트를 그대로 쓰면 선택 시 글자가 사라진다.
-            selection: with_lightness(primary, if lighter { 0.22 } else { 0.85 }),
-            ansi: ansi.iter().map(|c| hex_to_rgb(c)).collect(),
-        }
-    };
-    (build(0.07, &ANSI_DARK, true), build(0.97, &ANSI_LIGHT, false))
+    // 검정 배경에 묻히는 브랜드색(쿠팡 #000000)은 밝혀서 커서·탭이 사라지지 않게 한다.
+    let (accent, _) = push_to_contrast(primary, background, CONTRAST_ACCENT, true);
+    TerminalPalette {
+        background,
+        foreground: hex_to_rgb(TERMINAL_FOREGROUND),
+        accent,
+        // 선택 영역에 액센트를 그대로 쓰면 선택 시 흰 글자가 사라진다.
+        selection: with_lightness(primary, 0.22),
+        ansi: ANSI.iter().map(|c| hex_to_rgb(c)).collect(),
+    }
 }
 
 #[cfg(test)]
@@ -250,8 +243,7 @@ mod tests {
 
     fn brand(primary: &str, secondary: &str) -> Brand {
         Brand { key: "t".into(), name: "T".into(), primary: primary.into(),
-                secondary: secondary.into(), paths: vec![], logo: None,
-                verified: None, logo_path: None }
+                secondary: secondary.into(), logo: None, verified: None, logo_path: None }
     }
 
     #[test]
@@ -332,5 +324,23 @@ mod tests {
         let adjusted = gradient(&subject).start;
         let hue_difference = (rgb_to_hls(original).0 - rgb_to_hls(adjusted).0).abs();
         assert!(hue_difference < 0.01, "색상이 바뀌었다: {hue_difference}");
+    }
+
+    #[test]
+    fn 로고는_띠_위에서_검정과_흰색_중_대비가_큰_쪽으로_칠한다() {
+        // 보조색을 4.5:1까지만 밀었더니 어두운 띠 위 회색 로고(삼성·우버)가 얼룩으로 보였다.
+        assert_eq!(logo_colour(&brand("#FEE500", "#333333")), [0.0, 0.0, 0.0], "노란 띠에는 검정");
+        assert_eq!(logo_colour(&brand("#3549FF", "#FFFFFF")), [1.0, 1.0, 1.0], "파란 띠에는 흰색");
+        assert_eq!(logo_colour(&brand("#000000", "#000000")), [1.0, 1.0, 1.0], "검정 브랜드에는 흰색");
+    }
+
+    #[test]
+    fn 검정_배경에_묻히는_브랜드색도_커서와_탭에서_보인다() {
+        // 배경을 검정으로 고정하자 쿠팡·무신사(#000000)는 액센트가 배경에 묻힐 수 있다.
+        let colours = terminal_palette(&brand("#000000", "#000000"));
+        let ratio = contrast_ratio(colours.accent, colours.background);
+        assert!(ratio >= CONTRAST_ACCENT, "액센트가 검정 배경에 묻힌다: {ratio:.2}:1");
+        assert!(contrast_ratio(colours.foreground, colours.selection) >= CONTRAST_ACCENT,
+                "선택 영역에서 흰 글자가 안 읽힌다");
     }
 }

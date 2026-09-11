@@ -6,7 +6,5 @@ primary: '#7234E0'
 secondary: '#16181D'
 verified: 2026-06-17
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=about.ncsoft.com&sz=128
-paths:
-- ~/Desktop/ncsoft(|/*)
+  kind: import-icon
+  url: https://github.com/ncsoft.png?size=512

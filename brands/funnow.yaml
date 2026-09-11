@@ -8,5 +8,3 @@ verified: 2026-06-10
 logo:
   kind: favicon
   url: https://cdn.myfunnow.com/web/images/funnow_favicon.svg
-paths:
-- ~/Desktop/funnow(|/*)

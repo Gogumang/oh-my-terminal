@@ -4,6 +4,11 @@
 //!   - 실루엣: 형태(알파)만 남기고 세그먼트 배경에 맞춰 색을 입힌다. 대부분의 로고.
 //!   - 원본 컬러: 색 면에서 글자를 파낸 앱 아이콘(배민·쿠팡·NOL). 실루엣으로 만들면
 //!     통짜 동그라미/네모가 되어 알아볼 수 없다.
+//!
+//! iTerm2 GPU 렌더러는 컬러 글리프도 알파만 써서 글자색으로 칠한다. 그래서 색 면 위의 마크는
+//! 색 차이를 알파로 옮겨야 보인다 (remove_dominant_colour·cut_minor_colours).
+
+use std::collections::BTreeMap;
 
 use image::{imageops, Rgba, RgbaImage};
 
@@ -12,6 +17,13 @@ const CORNER_TOLERANCE: i32 = 32;
 const FAINT_ALPHA: u8 = 30;
 /// 이보다 불투명하면 그림이 아니라 배경 사각형이 깔린 것으로 본다.
 const OPAQUE_ENOUGH_TO_BE_BACKGROUND: f64 = 0.95;
+/// 채널 최대 차이가 이 안이면 같은 면, 이 밖이면 다른 부분으로 본다. 사이는 알파를 이어 준다.
+const SAME_COLOUR: i32 = 24;
+const OTHER_COLOUR: i32 = 72;
+/// 화면에서 획이 이보다 가늘면 굵힌다 (레티나 픽셀).
+const MIN_STROKE_SCREEN_PIXELS: f64 = 2.0;
+/// 한쪽으로 넓히는 최대 폭 (이미지 픽셀). 넘치면 글자 워드마크가 뭉개진다.
+const MAX_THICKEN: u32 = 5;
 
 pub fn alpha_coverage(image: &RgbaImage) -> f64 {
     let opaque = image.pixels().filter(|p| p.0[3] > FAINT_ALPHA).count();
@@ -168,6 +180,125 @@ pub fn tint(image: &RgbaImage, colour: [u8; 3]) -> RgbaImage {
     result
 }
 
+/// 불투명 픽셀에서 가장 많은 색. 채널당 5비트로 묶어 세고 그 묶음의 평균색을 돌려준다.
+/// 같은 수면 BTreeMap 순서로 정해져 결과가 빌드마다 같다.
+fn dominant_colour(image: &RgbaImage) -> Option<[u8; 3]> {
+    let mut buckets: BTreeMap<[u8; 3], (u64, [u64; 3])> = BTreeMap::new();
+    for pixel in image.pixels().filter(|p| p.0[3] > 200) {
+        let [r, g, b, _] = pixel.0;
+        let entry = buckets.entry([r >> 3, g >> 3, b >> 3]).or_insert((0, [0; 3]));
+        entry.0 += 1;
+        for (sum, value) in entry.1.iter_mut().zip([r, g, b]) {
+            *sum += value as u64;
+        }
+    }
+    buckets.into_values().max_by_key(|(count, _)| *count)
+        .map(|(count, sums)| sums.map(|sum| (sum / count) as u8))
+}
+
+/// 0(같은 면) ~ 1(확실히 다른 색). 경계의 안티앨리어싱 픽셀이 계단 없이 이어지게 한다.
+fn difference(pixel: &Rgba<u8>, colour: [u8; 3]) -> f64 {
+    let distance = (0..3).map(|i| (pixel.0[i] as i32 - colour[i] as i32).abs()).max().unwrap_or(0);
+    ((distance - SAME_COLOUR) as f64 / (OTHER_COLOUR - SAME_COLOUR) as f64).clamp(0.0, 1.0)
+}
+
+fn scale_alpha(image: &RgbaImage, keep: impl Fn(&Rgba<u8>) -> f64) -> RgbaImage {
+    let mut result = image.clone();
+    for pixel in result.pixels_mut() {
+        let kept = keep(pixel);
+        pixel.0[3] = (pixel.0[3] as f64 * kept).round() as u8;
+    }
+    result
+}
+
+/// 색 면 위에 마크를 올린 앱 아이콘에서 면(가장 많은 색)을 지우고 마크만 남긴다.
+/// 알파만 쓰는 렌더러에서는 면이 남으면 통짜 사각형이 된다.
+pub fn remove_dominant_colour(image: &RgbaImage) -> RgbaImage {
+    let Some(face) = dominant_colour(image) else { return image.clone() };
+    scale_alpha(image, |pixel| difference(pixel, face))
+}
+
+/// 색 면에 글자를 파낸 배지(배민·쿠팡)에서 면만 남기고 다른 색(글자)은 구멍으로 뚫는다.
+/// 알파만 쓰면 글자가 면에 묻혀 통짜 원·톱니만 남는다.
+pub fn cut_minor_colours(image: &RgbaImage) -> RgbaImage {
+    let Some(face) = dominant_colour(image) else { return image.clone() };
+    scale_alpha(image, |pixel| 1.0 - difference(pixel, face))
+}
+
+/// 알파를 반경만큼 넓힌다. 정사각 창의 최대값은 가로·세로 두 번으로 나눠 구한다.
+pub fn dilate(image: &RgbaImage, radius: u32) -> RgbaImage {
+    if radius == 0 {
+        return image.clone();
+    }
+    let (width, height) = image.dimensions();
+    let reach = radius as i64;
+    let pass = |source: &[u8], horizontal: bool| -> Vec<u8> {
+        let mut grown = vec![0u8; source.len()];
+        for y in 0..height as i64 {
+            for x in 0..width as i64 {
+                let mut strongest = 0u8;
+                for step in -reach..=reach {
+                    let (nx, ny) = if horizontal { (x + step, y) } else { (x, y + step) };
+                    if nx >= 0 && ny >= 0 && nx < width as i64 && ny < height as i64 {
+                        strongest = strongest.max(source[(ny * width as i64 + nx) as usize]);
+                    }
+                }
+                grown[(y * width as i64 + x) as usize] = strongest;
+            }
+        }
+        grown
+    };
+    let alpha: Vec<u8> = image.pixels().map(|p| p.0[3]).collect();
+    let grown = pass(&pass(&alpha, true), false);
+    let mut result = image.clone();
+    for (pixel, value) in result.pixels_mut().zip(grown) {
+        pixel.0[3] = value;
+    }
+    result
+}
+
+/// 획 두께(픽셀)를 어림한다. 가장자리를 한 겹씩 깎아 불투명 픽셀이 절반으로 줄 때까지의
+/// 횟수를 센다 — 긴 획은 한 번에 양쪽이 한 겹씩 깎이므로 두께는 그 네 배쯤이다.
+pub fn stroke_width(image: &RgbaImage) -> f64 {
+    let (width, height) = image.dimensions();
+    let mut solid: Vec<bool> = image.pixels().map(|p| p.0[3] > 127).collect();
+    let initial = solid.iter().filter(|s| **s).count();
+    if initial == 0 {
+        return 0.0;
+    }
+    let w = width as usize;
+    for depth in 1..=64 {
+        let previous = solid.clone();
+        for y in 0..height as usize {
+            for x in 0..w {
+                let i = y * w + x;
+                if !previous[i] { continue; }
+                let edge = x == 0 || y == 0 || x + 1 == w || y + 1 == height as usize
+                    || !previous[i - 1] || !previous[i + 1] || !previous[i - w] || !previous[i + w];
+                if edge { solid[i] = false; }
+            }
+        }
+        if solid.iter().filter(|s| **s).count() * 2 <= initial {
+            return depth as f64 * 4.0;
+        }
+    }
+    256.0
+}
+
+/// 작게 그렸을 때 획이 너무 가늘면 필요한 만큼만 굵힌다.
+/// `pixels_per_screen_pixel`: 이 이미지 몇 픽셀이 화면 한 픽셀인지.
+///
+/// 가는 로고(나이키 스우시·SpaceX)는 글자 칸 크기에서 1픽셀 아래로 가늘어져 흐릿한 선만
+/// 남았다. 굵은 로고까지 굵히면 글자 워드마크가 뭉개지므로 가는 경우에만 굵힌다.
+pub fn thicken_thin_strokes(image: &RgbaImage, pixels_per_screen_pixel: f64) -> RgbaImage {
+    let on_screen = stroke_width(image) / pixels_per_screen_pixel;
+    if on_screen >= MIN_STROKE_SCREEN_PIXELS {
+        return image.clone();
+    }
+    let missing = (MIN_STROKE_SCREEN_PIXELS - on_screen) * pixels_per_screen_pixel;
+    dilate(image, ((missing / 2.0).ceil() as u32).min(MAX_THICKEN))
+}
+
 #[cfg(test)]
 #[allow(non_snake_case)]   // 테스트 이름은 동작 서술형 한국어를 쓴다
 mod tests {
@@ -178,6 +309,17 @@ mod tests {
         let mut image = RgbaImage::new(size, size);
         for (x, y, pixel) in image.enumerate_pixels_mut() {
             *pixel = Rgba([255, 255, 255, if opaque(x, y) { 255 } else { 0 }]);
+        }
+        image
+    }
+
+    /// 빨간 면 가운데에 흰 마크가 있는 불투명 16x16 이미지.
+    fn badge() -> RgbaImage {
+        let mut image = RgbaImage::from_pixel(16, 16, Rgba([230, 30, 40, 255]));
+        for x in 6..10 {
+            for y in 6..10 {
+                image.put_pixel(x, y, Rgba([255, 255, 255, 255]));
+            }
         }
         image
     }
@@ -247,5 +389,31 @@ mod tests {
         let fitted = fit(&tiny, 64);
         assert_eq!(fitted.dimensions(), (64, 64));
         assert!(alpha_coverage(&fitted) > 0.9, "확대되지 않았다");
+    }
+
+    #[test]
+    fn 앱_아이콘은_면_색을_지우고_마크만_남긴다() {
+        let mark = remove_dominant_colour(&badge());
+        assert_eq!(mark.get_pixel(1, 1).0[3], 0, "면이 남아 통짜 사각형이 된다");
+        assert_eq!(mark.get_pixel(8, 8).0[3], 255, "마크가 지워졌다");
+    }
+
+    #[test]
+    fn 배지는_면을_남기고_파낸_글자를_구멍으로_뚫는다() {
+        // 배민·쿠팡은 색 면에 글자가 있어, 알파만 쓰면 글자 없는 통짜 원이 됐다.
+        let cut = cut_minor_colours(&badge());
+        assert_eq!(cut.get_pixel(1, 1).0[3], 255, "면이 지워졌다");
+        assert_eq!(cut.get_pixel(8, 8).0[3], 0, "글자가 구멍으로 뚫리지 않았다");
+    }
+
+    #[test]
+    fn 가는_획만_굵히고_굵은_도형은_그대로_둔다() {
+        // 이미지 5픽셀이 화면 1픽셀이라 치면 2픽셀 굵기 선은 화면에서 0.4픽셀이다.
+        let thin = image_with(64, &|_, y| (31..33).contains(&y));
+        let thick = image_with(64, &|x, y| (12..52).contains(&x) && (12..52).contains(&y));
+        assert!(stroke_width(&thin) < stroke_width(&thick), "두께 어림이 거꾸로다");
+        let thickened = thicken_thin_strokes(&thin, 5.0);
+        assert!(alpha_coverage(&thickened) > alpha_coverage(&thin) * 2.0, "가는 선을 굵히지 않았다");
+        assert!(thicken_thin_strokes(&thick, 5.0) == thick, "굵은 도형까지 굵혔다");
     }
 }

@@ -6,7 +6,5 @@ primary: '#FF9933'
 secondary: '#0F0F0F'
 verified: 2026-05-19
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=cookpad.com&sz=128
-paths:
-- ~/Desktop/cookpad(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/6f/8f/1c/6f8f1c01-5697-759a-bf09-3f11bc430392/AppIcon-JP-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg

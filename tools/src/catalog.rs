@@ -170,7 +170,7 @@ pub fn fetch_logos(root: &Path, only: &[String]) -> Result<()> {
         let brand = Brand {
             key: entry.key.clone(), name: entry.name.clone(),
             primary: entry.primary.clone(), secondary: entry.secondary.clone(),
-            paths: Vec::new(), verified: None, logo_path: None,
+            verified: None, logo_path: None,
             logo: Some(LogoSource { kind: logo.kind.clone(), url: logo.url.clone(),
                                     keep_colour: false }),
         };
@@ -213,7 +213,6 @@ pub fn enable(keys: &[String], root: &Path) -> Result<()> {
         let brand = Brand {
             key: entry.key.clone(), name: entry.name.clone(),
             primary: entry.primary.clone(), secondary: entry.secondary.clone(),
-            paths: vec![format!("~/Desktop/{}(|/*)", entry.key)],
             logo: entry.logo.as_ref().map(|logo| LogoSource {
                 kind: logo.kind.clone(), url: logo.url.clone(), keep_colour: false }),
             verified: entry.verified.clone(), logo_path: None,

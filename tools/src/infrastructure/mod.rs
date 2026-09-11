@@ -4,4 +4,5 @@ pub mod iterm2_writer;
 pub mod logo_repository;
 pub mod logo_shaper;
 pub mod p10k_writer;
+pub mod preview;
 pub mod rasterizer;

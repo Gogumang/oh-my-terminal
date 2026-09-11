@@ -6,7 +6,5 @@ primary: '#0067AC'
 secondary: '#000000'
 verified: 2026-07-14
 logo:
-  kind: favicon
-  url: https://www.google.com/s2/favicons?domain=wooribank.com&sz=256
-paths:
-- ~/Desktop/wooribank(|/*)
+  kind: import-icon
+  url: https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/07/1f/94/071f94c6-831f-1ac9-4c50-8fa5ccc031e4/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.png/512x512bb.jpg
