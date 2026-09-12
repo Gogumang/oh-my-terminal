@@ -11,6 +11,7 @@
 //! 사용자가 넣은 파일은 어느 것도 덮어쓰지 않는다.
 
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 use std::time::Duration;
 
 use anyhow::{anyhow, Result};
@@ -28,21 +29,41 @@ const USABLE_COVERAGE: (f64, f64) = (0.06, 0.70);
 pub struct LogoRepository {
     directory: PathBuf,
     committed: PathBuf,
+}
+
+/// 로고 하나를 준비한 결과. 실패 사유(노트)를 리포지터리에 쌓지 않고 돌려준다 —
+/// 여러 회사를 동시에 준비할 때 공유 가변 상태가 있으면 병렬로 돌릴 수 없고,
+/// 노트가 쌓이는 순서도 실행마다 달라진다.
+pub struct Prepared {
+    pub path: Option<PathBuf>,
     pub notes: Vec<String>,
+}
+
+impl Prepared {
+    fn done(path: PathBuf) -> Self {
+        Self { path: Some(path), notes: Vec::new() }
+    }
+
+    fn failed(note: String) -> Self {
+        Self { path: None, notes: vec![note] }
+    }
+
+    fn nothing() -> Self {
+        Self { path: None, notes: Vec::new() }
+    }
 }
 
 impl LogoRepository {
     pub fn new(directory: impl AsRef<Path>, committed: impl AsRef<Path>) -> Self {
         Self { directory: directory.as_ref().to_path_buf(),
-               committed: committed.as_ref().to_path_buf(), notes: Vec::new() }
+               committed: committed.as_ref().to_path_buf() }
     }
 
-    pub fn prepare(&mut self, brand: &Brand) -> Option<PathBuf> {
+    pub fn prepare(&self, brand: &Brand) -> Prepared {
         // logos/ 는 gitignore 대상이라 새로 받은 저장소에는 없다. 만들지 않으면 커밋된 로고
         // 복사가 전부 실패해, 빌드는 성공하는데 로고 없는 폰트·프롬프트가 조용히 생성된다.
         if let Err(error) = std::fs::create_dir_all(&self.directory) {
-            self.notes.push(format!("{}: 로고 작업 디렉터리 생성 실패 ({error})", brand.name));
-            return None;
+            return Prepared::failed(format!("{}: 로고 작업 디렉터리 생성 실패 ({error})", brand.name));
         }
         let target = self.directory.join(format!("{}.png", brand.key));
 
@@ -50,10 +71,9 @@ impl LogoRepository {
         let committed = self.committed.join(format!("{}.png", brand.key));
         if committed.exists() {
             if let Err(error) = std::fs::copy(&committed, &target) {
-                self.notes.push(format!("{}: 커밋된 로고 복사 실패 ({error})", brand.name));
-                return None;
+                return Prepared::failed(format!("{}: 커밋된 로고 복사 실패 ({error})", brand.name));
             }
-            return Some(target);
+            return Prepared::done(target);
         }
 
         let colour_logo = self.directory.join(format!("{}.color.png", brand.key));
@@ -74,13 +94,12 @@ impl LogoRepository {
             }
         }
 
-        let source = brand.logo.as_ref()?;
+        let Some(source) = brand.logo.as_ref() else { return Prepared::nothing() };
         let image = match self.download(&source.url) {
             Ok(image) => image,
             Err(error) => {                        // 로고는 보조 데이터 — 색은 살린다
-                self.notes.push(format!("{}: 내려받기 실패 ({error})", brand.name));
                 let _ = std::fs::remove_file(&target);
-                return None;
+                return Prepared::failed(format!("{}: 내려받기 실패 ({error})", brand.name));
             }
         };
 
@@ -100,10 +119,9 @@ impl LogoRepository {
             }
             let coverage = shaper::alpha_coverage(&shape);
             if coverage < USABLE_COVERAGE.0 || coverage > USABLE_COVERAGE.1 {
-                self.notes.push(format!("{}: 실루엣이 형태를 잃음 (점유율 {:.0}%)",
-                                        brand.name, coverage * 100.0));
                 let _ = std::fs::remove_file(&target);
-                return None;
+                return Prepared::failed(format!("{}: 실루엣이 형태를 잃음 (점유율 {:.0}%)",
+                                                brand.name, coverage * 100.0));
             }
         }
         self.save(shaper::fit(&shaper::crop_to_content(&shape), LOGO_SIZE), &target, &brand.name)
@@ -111,13 +129,12 @@ impl LogoRepository {
 
     /// 저장 실패를 삼키면 존재하지 않는 경로가 logo_path에 남아, 나중에 폰트 생성이
     /// 빌드 전체를 실패시킨다. 로고는 보조 데이터이므로 여기서 노트로 남기고 없던 일로 한다.
-    fn save(&mut self, image: RgbaImage, target: &Path, brand_name: &str) -> Option<PathBuf> {
+    fn save(&self, image: RgbaImage, target: &Path, brand_name: &str) -> Prepared {
         match image.save(target) {
-            Ok(()) => Some(target.to_path_buf()),
+            Ok(()) => Prepared::done(target.to_path_buf()),
             Err(error) => {
-                self.notes.push(format!("{brand_name}: 로고 저장 실패 ({error})"));
                 let _ = std::fs::remove_file(target);
-                None
+                Prepared::failed(format!("{brand_name}: 로고 저장 실패 ({error})"))
             }
         }
     }
@@ -138,11 +155,18 @@ impl LogoRepository {
     }
 }
 
+/// 내려받기용 HTTP 에이전트. 요청마다 새로 만들면 연결과 TLS 악수를 매번 다시 한다 —
+/// 로고 수백 개가 같은 호스트(cdn.simpleicons.org)에서 오므로 하나를 공유해 연결을 재사용한다.
+/// 에이전트는 내부적으로 스레드 안전하다 (Clone은 같은 연결 풀을 가리킨다).
+fn agent() -> &'static ureq::Agent {
+    static AGENT: OnceLock<ureq::Agent> = OnceLock::new();
+    AGENT.get_or_init(|| ureq::AgentBuilder::new()
+        .timeout(TIMEOUT).user_agent("Mozilla/5.0 (oh-my-terminal)").build())
+}
+
 /// 원격 파일을 받는다. 봇 차단을 피하려고 브라우저 계열 User-Agent를 쓴다.
 pub fn fetch_bytes(url: &str) -> Result<Vec<u8>> {
-    let response = ureq::AgentBuilder::new()
-        .timeout(TIMEOUT).user_agent("Mozilla/5.0 (oh-my-terminal)").build()
-        .get(url).call()?;
+    let response = agent().get(url).call()?;
     let mut data = Vec::new();
     std::io::Read::read_to_end(&mut response.into_reader(), &mut data)?;
     if data.is_empty() {
@@ -188,14 +212,14 @@ mod tests {
         std::fs::create_dir_all(&committed).unwrap();
         std::fs::write(committed.join("t.png"), b"png").unwrap();
 
-        let mut repository = LogoRepository::new(root.join("logos"), &committed);
+        let repository = LogoRepository::new(root.join("logos"), &committed);
         let brand = Brand { key: "t".into(), name: "T".into(), country: None, primary: "#0064FF".into(),
                             secondary: "#0064FF".into(), logo: None, verified: None,
                             logo_path: None };
         let prepared = repository.prepare(&brand);
         let _ = std::fs::remove_dir_all(&root);
 
-        assert!(repository.notes.is_empty(), "노트가 남았다: {:?}", repository.notes);
-        assert_eq!(prepared, Some(root.join("logos/t.png")));
+        assert!(prepared.notes.is_empty(), "노트가 남았다: {:?}", prepared.notes);
+        assert_eq!(prepared.path, Some(root.join("logos/t.png")));
     }
 }

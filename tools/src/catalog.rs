@@ -6,8 +6,10 @@
 
 use std::collections::BTreeMap;
 use std::path::Path;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use anyhow::{anyhow, Result};
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::brand::{Brand, LogoSource};
@@ -147,52 +149,70 @@ pub fn build(dataset: &Path, root: &Path) -> Result<()> {
 /// 이렇게 해두면 어느 회사든 `enable` 한 번으로 즉시 켜진다 — 네트워크도, 출처가
 /// 막혀 실패할 위험도 없다. 원격 출처는 사라지거나 봇 차단으로 막히기 때문에
 /// (쿠팡이 그랬다) 받을 수 있을 때 받아 두는 편이 낫다.
+/// 동시에 받을 개수. 한 호스트(cdn.simpleicons.org)에 몰리므로 코어 수만큼 늘리지 않는다 —
+/// 시간은 대부분 응답 대기라 이 정도로 충분히 줄고, 상대 서버에 무리도 주지 않는다.
+const FETCH_THREADS: usize = 8;
+
 pub fn fetch_logos(root: &Path, only: &[String]) -> Result<()> {
     let catalog: Catalog = serde_json::from_str(
         &std::fs::read_to_string(root.join("catalog/brands.json"))?)?;
     let committed = root.join("public/logo");
     std::fs::create_dir_all(&committed)?;
-    let mut repository = LogoRepository::new(root.join("logos"), &committed);
+    let repository = LogoRepository::new(root.join("logos"), &committed);
 
     let targets: Vec<&Entry> = catalog.brands.iter()
         .filter(|entry| only.is_empty() || only.iter().any(|key| key == &entry.key))
         .collect();
     let total = targets.len();
-    let (mut done, mut skipped, mut failed) = (0usize, 0usize, 0usize);
 
-    for (index, entry) in targets.iter().enumerate() {
-        let target = committed.join(format!("{}.png", entry.key));
-        if target.exists() {
-            skipped += 1;
-            continue;
-        }
-        let Some(logo) = &entry.logo else { failed += 1; continue };
-        let brand = Brand {
-            key: entry.key.clone(), name: entry.name.clone(), country: entry.country.clone(),
-            primary: entry.primary.clone(), secondary: entry.secondary.clone(),
-            verified: None, logo_path: None,
-            logo: Some(LogoSource { kind: logo.kind.clone(), url: logo.url.clone(),
-                                    keep_colour: false }),
-        };
-        match repository.prepare(&brand) {
-            Some(working) => {
-                std::fs::copy(&working, &target)?;
-                done += 1;
+    // 한 건에 드는 시간은 거의 전부 원격 응답을 기다리는 시간이다 — 순차로 받으면
+    // 440개가 그 대기의 합이 된다. 결과는 입력 순서대로 모이므로 보고는 그대로다.
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(FETCH_THREADS).build()?;
+    let finished = AtomicUsize::new(0);
+    let outcomes: Vec<(bool, Option<String>, Vec<String>)> = pool.install(|| {
+        targets.par_iter().map(|entry| {
+            let target = committed.join(format!("{}.png", entry.key));
+            if target.exists() {
+                return (true, None, Vec::new());
             }
-            None => failed += 1,
-        }
-        if (index + 1) % 25 == 0 {
-            eprintln!("  … {}/{total}  받음 {done} · 실패 {failed}", index + 1);
-        }
-    }
+            let Some(logo) = &entry.logo else { return (false, None, Vec::new()) };
+            let brand = Brand {
+                key: entry.key.clone(), name: entry.name.clone(), country: entry.country.clone(),
+                primary: entry.primary.clone(), secondary: entry.secondary.clone(),
+                verified: None, logo_path: None,
+                logo: Some(LogoSource { kind: logo.kind.clone(), url: logo.url.clone(),
+                                        keep_colour: false }),
+            };
+            let prepared = repository.prepare(&brand);
+            let copied = prepared.path.as_ref()
+                .map(|working| std::fs::copy(working, &target)
+                    .map_err(|error| format!("{}: 결과 복사 실패 ({error})", entry.name)));
+
+            let count = finished.fetch_add(1, Ordering::Relaxed) + 1;
+            if count.is_multiple_of(25) {
+                eprintln!("  … {count}/{total}");
+            }
+            match copied {
+                Some(Ok(_)) => (false, Some(entry.key.clone()), prepared.notes),
+                Some(Err(note)) => (false, None, vec![note]),
+                None => (false, None, prepared.notes),
+            }
+        }).collect()
+    });
+
+    let skipped = outcomes.iter().filter(|(existing, ..)| *existing).count();
+    let done = outcomes.iter().filter(|(_, fetched, _)| fetched.is_some()).count();
+    let failed = total - skipped - done;
+    let notes: Vec<&String> = outcomes.iter().flat_map(|(.., notes)| notes).collect();
+
     println!("로고 수집 완료: 받음 {done} · 이미 있음 {skipped} · 실패 {failed} (전체 {total})");
     if failed > 0 {
         println!("\n실패 사유:");
-        for note in repository.notes.iter().take(40) {
+        for note in notes.iter().take(40) {
             println!("  {note}");
         }
-        if repository.notes.len() > 40 {
-            println!("  … 외 {}건", repository.notes.len() - 40);
+        if notes.len() > 40 {
+            println!("  … 외 {}건", notes.len() - 40);
         }
     }
     Ok(())
@@ -203,7 +223,8 @@ pub fn enable(keys: &[String], root: &Path) -> Result<()> {
         &std::fs::read_to_string(root.join("catalog/brands.json"))?)?;
     let index: BTreeMap<&str, &Entry> =
         catalog.brands.iter().map(|e| (e.key.as_str(), e)).collect();
-    let mut repository = LogoRepository::new(root.join("logos"), root.join("public/logo"));
+    let repository = LogoRepository::new(root.join("logos"), root.join("public/logo"));
+    let mut notes = Vec::new();
 
     for key in keys {
         let Some(entry) = index.get(key.as_str()) else {
@@ -218,6 +239,7 @@ pub fn enable(keys: &[String], root: &Path) -> Result<()> {
             verified: entry.verified.clone(), logo_path: None,
         };
         let prepared = repository.prepare(&brand);
+        notes.extend(prepared.notes);
 
         // 회사명·URL은 외부 데이터셋에서 온다. format!으로 YAML을 조립하면 따옴표나
         // 콜론이 든 값 하나에 파일이 깨진다 — 직렬화기에 맡겨 그 부류를 없앤다.
@@ -227,10 +249,10 @@ pub fn enable(keys: &[String], root: &Path) -> Result<()> {
             entry.verified.as_deref().unwrap_or("?"), entry.key);
         let document = header + &serde_yaml::to_string(&brand)?;
         std::fs::write(root.join(format!("brands/{}.yaml", entry.key)), document)?;
-        println!("  {} {} ({})", if prepared.is_some() { "로고" } else { "  · " },
+        println!("  {} {} ({})", if prepared.path.is_some() { "로고" } else { "  · " },
                  entry.name, entry.primary);
     }
-    for note in &repository.notes { eprintln!("  ! {note}"); }
+    for note in &notes { eprintln!("  ! {note}"); }
     println!("\n다음: build-themes");
     Ok(())
 }

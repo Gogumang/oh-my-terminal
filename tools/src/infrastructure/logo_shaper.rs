@@ -329,7 +329,7 @@ mod tests {
         // 네이버의 굵은 N은 획이 네 모서리에 전부 닿는다. 배경 제거를 태우면
         // 로고가 통째로 지워진다 — 이번 프로젝트에서 실제로 겪은 회귀다.
         // 방어선은 strip_uniform_background 안이 아니라 이 판단에 있다.
-        let logo = image_with(16, &|x, y| x == y || x < 2 || x > 13);
+        let logo = image_with(16, &|x, y| x == y || !(2..=13).contains(&x));
         assert!(alpha_coverage(&logo) < 0.95, "픽스처가 로고답지 않다");
         assert!(!needs_background_strip(&logo), "로고를 배경 제거 대상으로 판단했다");
 

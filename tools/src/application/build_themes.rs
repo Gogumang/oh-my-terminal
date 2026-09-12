@@ -3,11 +3,12 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
+use rayon::prelude::*;
 
 use crate::domain::brand::Brand;
 use crate::domain::palette;
-use crate::infrastructure::{brand_catalog::YamlBrandCatalog, font_writer,
-                            iterm2_writer, logo_repository::LogoRepository, p10k_writer};
+use crate::infrastructure::{brand_catalog::YamlBrandCatalog, font_writer, iterm2_writer,
+                            logo_repository::{LogoRepository, Prepared}, p10k_writer};
 
 pub struct BrandReport {
     pub name: String,
@@ -33,19 +34,26 @@ fn needs_prepare(brand: &Brand, committed: &Path) -> bool {
 pub fn run(root: &Path, base_font: &Path) -> Result<Report> {
     let catalog = YamlBrandCatalog::new(root.join("brands"), root.join("logos"));
     let committed = root.join("public/logo");
-    let mut repository = LogoRepository::new(root.join("logos"), &committed);
+    let repository = LogoRepository::new(root.join("logos"), &committed);
 
     let mut brands = catalog.load()?;
-    for brand in brands.iter_mut() {
-        if needs_prepare(brand, &committed) {
-            brand.logo_path = repository.prepare(brand);
+    // 회사마다 로고를 복사·가공하는 일은 서로 독립이다. 노트는 회사별로 돌려받아 입력 순서대로
+    // 이어 붙인다 — 공유 벡터에 쌓으면 경고 순서가 실행마다 달라진다.
+    let prepared: Vec<Option<Prepared>> = brands.par_iter()
+        .map(|brand| needs_prepare(brand, &committed).then(|| repository.prepare(brand)))
+        .collect();
+
+    let mut warnings = Vec::new();
+    for (brand, prepared) in brands.iter_mut().zip(prepared) {
+        if let Some(prepared) = prepared {
+            brand.logo_path = prepared.path;
+            warnings.extend(prepared.notes);
         }
     }
 
     let artifact = font_writer::write_font(base_font, &brands, root)?;
     let glyphs = artifact.as_ref().map(|a| a.glyphs.clone()).unwrap_or_default();
 
-    let mut warnings = repository.notes.clone();
     let mut reports = Vec::new();
     for brand in &brands {
         let gradient = palette::gradient(brand);

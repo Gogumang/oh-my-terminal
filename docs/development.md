@@ -49,7 +49,10 @@ Nerd Font 아이콘(git 브랜치 등)이 기반 폰트에 있어야 합니다. 
 OH_MY_TERMINAL_BASE_FONT=~/Library/Fonts/<Nerd Font>.ttf tools/target/release/build-themes
 ```
 
-빌더는 Rust입니다. `cargo build --release` 하나면 되고 다른 의존성이 없습니다.
+빌더는 Rust입니다(1.88 이상). `cargo build --release` 하나면 되고 다른 의존성이 없습니다.
+회사마다 하는 일(로고 가공·그림 그리기·내려받기)은 서로 독립이라 코어 수만큼 동시에 돕니다 —
+`gallery`가 279장을 5.3초에서 0.6초로 그립니다. 생성물은 실행 순서와 무관하게 늘 같은 바이트라,
+다시 빌드해도 `git status`가 비어 있어야 정상입니다(그렇지 않다면 회귀입니다).
 
 ## 로고
 

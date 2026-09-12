@@ -17,6 +17,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 use image::{imageops, RgbaImage};
+use rayon::prelude::*;
 use write_fonts::read::{CollectionRef, FontRef, TableProvider};
 use write_fonts::types::Tag;
 use write_fonts::FontBuilder;
@@ -72,7 +73,7 @@ pub struct Metrics {
 }
 
 impl Metrics {
-    fn to_pixels(&self, units: i32) -> f64 {
+    fn to_pixels(self, units: i32) -> f64 {
         units as f64 * CANVAS_PPEM as f64 / self.units_per_em as f64
     }
 
@@ -88,9 +89,12 @@ impl Metrics {
 }
 
 /// 외곽선 글리프 하나. `lsb`는 hmtx에 적을 왼쪽 여백(= 외곽선의 xMin)이다.
+/// `points`·`contours`는 maxp에 적을 최댓값을 구하는 데 쓴다.
 struct OutlineGlyph {
     record: Vec<u8>,
     lsb: i16,
+    points: usize,
+    contours: usize,
 }
 
 pub fn rgb8(rgb: Rgb) -> [u8; 3] {
@@ -113,23 +117,38 @@ pub fn write_font(base: &Path, brands: &[Brand], output_root: &Path) -> Result<O
     let metrics = read_metrics(&open_font(&data)?)?;
 
     // ── 로고 → 칸 조각 → 외곽선 글리프 ───────────────────────────────
+    // PNG 해독·캔버스 합성·윤곽 추출은 회사마다 독립이라 코어 수만큼 나눈다. 코드포인트는
+    // 나중에 순서대로 매기므로(par_iter → collect가 입력 순서를 지킨다) 결과는 순차와 같다 —
+    // 폰트 바이트가 실행마다 달라지면 판 번호가 흔들려 iTerm2가 매번 새 폰트로 읽는다.
+    let sliced: Vec<Vec<OutlineGlyph>> = usable.par_iter()
+        .map(|brand| {
+            let logo = image::open(brand.logo_path.as_ref().unwrap())?.to_rgba8();
+            let canvas = logo_canvas(&logo, None, &metrics);
+            slice_cells(&canvas, metrics.cell_pixels()).iter()
+                .map(|slice| {
+                    let contours = slice_contours(slice, &metrics);
+                    let points = contours.iter().map(Vec::len).sum::<usize>();
+                    if points > u16::MAX as usize {
+                        return Err(anyhow!("{}: 로고 조각의 점이 너무 많다 ({points}개)", brand.key));
+                    }
+                    Ok(OutlineGlyph { lsb: left_side_bearing(&contours),
+                                      points, contours: contours.len(),
+                                      record: encode_simple_glyph(&contours) })
+                })
+                .collect::<Result<Vec<_>>>()
+        })
+        .collect::<Result<_>>()?;
+
     let mut outlines: Vec<OutlineGlyph> = Vec::new();
     let mut largest = (0usize, 0usize);   // 글리프 하나의 최대 (점 수, 윤곽 수)
     let mut glyphs = BTreeMap::new();
-    for brand in &usable {
-        let logo = image::open(brand.logo_path.as_ref().unwrap())?.to_rgba8();
-        let canvas = logo_canvas(&logo, None, &metrics);
+    for (brand, slices) in usable.iter().zip(sliced) {
         let mut text = String::new();
-        for slice in slice_cells(&canvas, metrics.cell_pixels()) {
+        for outline in slices {
             let code = PUA_START + outlines.len() as u32;
             text.push(char::from_u32(code).ok_or_else(|| anyhow!("PUA 범위 초과"))?);
-            let contours = slice_contours(&slice, &metrics);
-            let points = contours.iter().map(Vec::len).sum::<usize>();
-            if points > u16::MAX as usize {
-                return Err(anyhow!("{}: 로고 조각의 점이 너무 많다 ({points}개)", brand.key));
-            }
-            largest = (largest.0.max(points), largest.1.max(contours.len()));
-            outlines.push(OutlineGlyph { lsb: left_side_bearing(&contours), record: encode_simple_glyph(&contours) });
+            largest = (largest.0.max(outline.points), largest.1.max(outline.contours));
+            outlines.push(outline);
         }
         glyphs.insert(brand.key.clone(), text);
     }
@@ -527,9 +546,9 @@ fn read_metrics(font: &FontRef) -> Result<Metrics> {
 fn append_glyphs(glyf: &[u8], loca: &[u8], long_format: bool,
                  records: &[&[u8]]) -> Result<(Vec<u8>, Vec<u8>)> {
     let mut offsets: Vec<u32> = if long_format {
-        loca.chunks_exact(4).map(|c| u32::from_be_bytes([c[0], c[1], c[2], c[3]])).collect()
+        loca.as_chunks::<4>().0.iter().map(|c| u32::from_be_bytes([c[0], c[1], c[2], c[3]])).collect()
     } else {
-        loca.chunks_exact(2).map(|c| u16::from_be_bytes([c[0], c[1]]) as u32 * 2).collect()
+        loca.as_chunks::<2>().0.iter().map(|c| u16::from_be_bytes([c[0], c[1]]) as u32 * 2).collect()
     };
     let end = *offsets.last().ok_or_else(|| anyhow!("loca 테이블이 비었다"))? as usize;
     let mut extended = glyf.get(..end)
@@ -645,8 +664,8 @@ mod tests {
         let contours = trace_contours(&mask, width, height);
         assert_eq!(contours.len(), 2, "바깥 윤곽과 구멍 윤곽 두 개여야 한다: {contours:?}");
         let areas: Vec<i64> = contours.iter().map(|c| signed_area(c)).collect();
-        assert!(areas.iter().any(|a| *a == -18), "바깥(3×3, 시계 방향)이 없다: {areas:?}");
-        assert!(areas.iter().any(|a| *a == 2), "구멍(1×1, 반시계 방향)이 없다: {areas:?}");
+        assert!(areas.contains(&-18), "바깥(3×3, 시계 방향)이 없다: {areas:?}");
+        assert!(areas.contains(&2), "구멍(1×1, 반시계 방향)이 없다: {areas:?}");
         assert!(contours.iter().all(|c| c.len() == 4), "직선 위 중간 점이 남았다: {contours:?}");
     }
 
@@ -734,7 +753,7 @@ mod tests {
         let last = vec![5u8; 2];
         let records: Vec<&[u8]> = vec![&first, &[], &last];
         let (extended, loca) = append_glyphs(&glyf, &short_loca, false, &records).unwrap();
-        let offsets: Vec<u32> = loca.chunks_exact(4)
+        let offsets: Vec<u32> = loca.as_chunks::<4>().0.iter()
             .map(|c| u32::from_be_bytes([c[0], c[1], c[2], c[3]])).collect();
         assert_eq!(offsets, [0, 4, 4, 10, 10, 12]);
         assert_eq!(&extended[4..10], &first[..]);

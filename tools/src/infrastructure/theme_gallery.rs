@@ -4,10 +4,12 @@
 //! 경로 세그먼트를 그린다. 칸 색은 셸과 같은 계산(palette::segment_cells), 글자는 브랜드 폰트의
 //! 기반인 MesloLGS NF 외곽선, 로고는 폰트에 굽는 것과 같은 캔버스를 쓰므로 화면과 같다.
 
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 use image::{imageops, Rgba, RgbaImage};
+use rayon::prelude::*;
 use tiny_skia::{FillRule, Paint, PathBuilder, Pixmap, Rect, Transform};
 
 use crate::domain::brand::Brand;
@@ -44,16 +46,22 @@ pub fn write(base_font: &Path, brands: &[Brand], directory: &Path) -> Result<Gal
     let metrics = font_writer::metrics_of(base_font)?;
     std::fs::create_dir_all(directory)?;
 
-    let mut images = Vec::new();
-    let mut height = 0;
-    for brand in brands {
-        let logo = brand.logo_path.as_ref().map(image::open).transpose()?.map(|logo| logo.to_rgba8());
-        let picture = render(brand, logo.as_ref(), &face, &metrics)?;
-        height = picture.height();
-        let output = directory.join(format!("{}.png", brand.key));
-        save_indexed(&picture, &output)?;
-        images.push(output);
-    }
+    // 회사끼리 아무것도 공유하지 않는다 (읽기 전용 face·metrics만 본다). 한 장에 드는 시간은
+    // 대부분 팔레트 양자화와 PNG 압축이라, 코어 수만큼 나누면 그만큼 줄어든다.
+    // par_iter → collect는 입력 순서를 지키므로 결과(높이·목록)는 순차 실행과 같다.
+    let rendered: Vec<(PathBuf, u32)> = brands.par_iter()
+        .map(|brand| {
+            let logo = brand.logo_path.as_ref().map(image::open).transpose()?
+                .map(|logo| logo.to_rgba8());
+            let picture = render(brand, logo.as_ref(), &face, &metrics)?;
+            let output = directory.join(format!("{}.png", brand.key));
+            save_indexed(&picture, &output)?;
+            Ok((output, picture.height()))
+        })
+        .collect::<Result<_>>()?;
+
+    let height = rendered.last().map_or(0, |(_, height)| *height);
+    let images: Vec<PathBuf> = rendered.into_iter().map(|(path, _)| path).collect();
     remove_stale(directory, &images)?;
     Ok(Gallery { images, height })
 }
@@ -64,8 +72,12 @@ pub fn write(base_font: &Path, brands: &[Brand], directory: &Path) -> Result<Gal
 fn save_indexed(picture: &RgbaImage, path: &Path) -> Result<()> {
     let quantizer = color_quant::NeuQuant::new(QUANTIZER_SAMPLING, PALETTE_SIZE, picture.as_raw());
     let map = quantizer.color_map_rgba();
-    let palette: Vec<u8> = map.chunks_exact(4).flat_map(|rgba| rgba[..3].to_vec()).collect();
-    let alpha: Vec<u8> = map.chunks_exact(4).map(|rgba| rgba[3]).collect();
+    let mut palette = Vec::with_capacity(map.len() / 4 * 3);
+    let mut alpha = Vec::with_capacity(map.len() / 4);
+    for rgba in map.as_chunks::<4>().0 {
+        palette.extend_from_slice(&rgba[..3]);
+        alpha.push(rgba[3]);
+    }
     let indices: Vec<u8> = picture.pixels().map(|pixel| quantizer.index_of(&pixel.0) as u8).collect();
 
     let file = std::io::BufWriter::new(std::fs::File::create(path)?);
@@ -80,9 +92,11 @@ fn save_indexed(picture: &RgbaImage, path: &Path) -> Result<()> {
 }
 
 fn remove_stale(directory: &Path, current: &[PathBuf]) -> Result<()> {
+    let current: HashSet<&Path> = current.iter().map(PathBuf::as_path).collect();
     for entry in std::fs::read_dir(directory)? {
         let path = entry?.path();
-        if path.extension().is_some_and(|extension| extension == "png") && !current.contains(&path) {
+        if path.extension().is_some_and(|extension| extension == "png")
+            && !current.contains(path.as_path()) {
             std::fs::remove_file(path)?;
         }
     }
