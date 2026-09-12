@@ -65,6 +65,9 @@ pub fn write_prompt(brands: &[Brand], glyphs: &BTreeMap<String, String>,
 
     let output = output_root.join("brands.zsh");
     std::fs::write(&output, document)?;
+    // 미리 파싱해 둔 판은 지운다. 남겨 두면 두 파일의 시각이 같은 초일 때 zsh 가 옛 판을
+    // 그대로 읽어, 새로 생성한 표가 조용히 무시된다 (셸이 첫 실행에서 다시 굽는다).
+    let _ = std::fs::remove_file(output.with_extension("zsh.zwc"));
     Ok(output)
 }
 
@@ -72,6 +75,23 @@ pub fn write_prompt(brands: &[Brand], glyphs: &BTreeMap<String, String>,
 #[allow(non_snake_case)]   // 테스트 이름은 동작 서술형 한국어를 쓴다
 mod tests {
     use super::*;
+
+    #[test]
+    fn 표를_다시_만들면_미리_파싱해_둔_판을_지운다() {
+        // 남겨 두면 두 파일의 시각이 같은 초일 때 zsh가 옛 .zwc를 읽어, 새로 생성한 표가
+        // 프롬프트에 조용히 반영되지 않는다.
+        let root = std::env::temp_dir()
+            .join(format!("oh-my-terminal-zwc-{}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        let stale = root.join("brands.zsh.zwc");
+        std::fs::write(&stale, b"stale wordcode").unwrap();
+
+        write_prompt(&[brand("t", "T")], &BTreeMap::new(), &root).unwrap();
+        let left_behind = stale.exists();
+        let _ = std::fs::remove_dir_all(&root);
+
+        assert!(!left_behind, "옛 .zwc가 남았다: {}", stale.display());
+    }
 
     fn brand(key: &str, name: &str) -> Brand {
         Brand { key: key.into(), name: name.into(), country: None, primary: "#0064FF".into(),

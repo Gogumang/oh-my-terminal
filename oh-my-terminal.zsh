@@ -10,9 +10,21 @@
 
 () {
   emulate -L zsh
+  local root=$1
+
+  # 미리 파싱해 둔 판(.zwc)을 만들어 둔다. source 는 같은 이름의 .zwc 가 더 새로우면 그것을
+  # 읽으므로, 31KB 표와 위젯 정의를 셸마다 다시 파싱하지 않는다 (셸 시작에서 약 1ms).
+  # 원본이 더 새로우면 zsh 가 .zwc 를 무시하므로, 굽기 전에도 동작은 늘 옳다.
+  # 저장소가 읽기 전용이면 조용히 넘어간다 — 있으면 빠르고 없으면 그대로 도는 최적화다.
+  # .zwc 가 원본보다 확실히 새로울 때만 그대로 둔다. 같은 초에 쓰였으면 다시 굽는다 —
+  # 원본이 1초 안에 바뀐 경우 zsh 는 옛 .zwc 를 그대로 읽어, 새 테마가 조용히 무시된다.
+  local script
+  for script in $root/brands.zsh $root/autosuggest.zsh; do
+    [[ ! -e $script || $script.zwc -nt $script ]] || zcompile -U -- $script 2>/dev/null
+  done
+
   [[ $OSTYPE == darwin* ]] || return 0
   zmodload -F zsh/files b:zf_mkdir b:zf_rm || return 0
-  local root=$1
 
   # 로고 폰트. 옛 판을 먼저 지운다 — 폰트 이름에 판 번호가 붙어 있어, 남겨 두면 이름이 다른 두
   # 폰트가 함께 설치된다. 이름이 바뀌므로 실행 중인 iTerm2도 새 폰트를 바로 읽는다.

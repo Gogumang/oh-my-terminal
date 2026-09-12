@@ -54,6 +54,10 @@ OH_MY_TERMINAL_BASE_FONT=~/Library/Fonts/<Nerd Font>.ttf tools/target/release/bu
 `gallery`가 279장을 5.3초에서 0.6초로 그립니다. 생성물은 실행 순서와 무관하게 늘 같은 바이트라,
 다시 빌드해도 `git status`가 비어 있어야 정상입니다(그렇지 않다면 회귀입니다).
 
+셸 쪽은 `brands.zsh`·`autosuggest.zsh`를 미리 파싱해 둔 `.zwc`로 읽습니다 — 진입점이 첫 셸에서
+굽고(원본이 더 새로우면 다시 굽습니다), 없어도 그냥 원본을 읽으므로 동작은 같습니다.
+`.zwc`는 커밋하지 않습니다.
+
 ## 로고
 
 완성된 로고는 `public/logo/<회사>.png`(512×512, 투명 배경 실루엣)에 커밋되어 있고, 빌더가
